@@ -461,3 +461,16 @@
 2026-08-05 23:33:26  DEBUG     [ml.prediction_service]  Feature validation passed  (12 features)
 2026-08-05 23:33:27  INFO      [ml.prediction_service]  Prediction: Moderate      confidence=0.6700  time=144.87 ms
 2026-08-05 23:33:27  DEBUG     [ml.prediction_service]  Probabilities: {'Very Weak': 0.08, 'Weak': 0.25, 'Moderate': 0.67, 'Strong': 0.0, 'Excellent': 0.0}
+2026-08-05 23:59:53  INFO      [ml.model_loader]  Creating ModelLoader singleton …
+2026-08-05 23:59:53  INFO      [ml.model_loader]  =======================================================
+2026-08-05 23:59:53  INFO      [ml.model_loader]  ModelLoader: loading artifacts …
+2026-08-05 23:59:54  INFO      [ml.model_loader]    Loaded model       ← password_strength_model.pkl  (RandomForestClassifier)
+2026-08-05 23:59:54  INFO      [ml.model_loader]    Loaded encoder     ← label_encoder.pkl  (LabelEncoder)
+2026-08-05 23:59:54  INFO      [ml.model_loader]    Loaded columns     ← feature_columns.pkl  (feature column list)
+2026-08-05 23:59:54  INFO      [ml.model_loader]  ModelLoader: all artifacts loaded  classes=[np.str_('Excellent'), np.str_('Moderate'), np.str_('Strong'), np.str_('Very Weak'), np.str_('Weak')]  n_features=12  n_estimators=100
+2026-08-05 23:59:54  INFO      [ml.model_loader]  =======================================================
+2026-08-05 23:59:54  INFO      [ml.prediction_service]  PasswordPredictionService ready  n_features=12  classes=[np.str_('Excellent'), np.str_('Moderate'), np.str_('Strong'), np.str_('Very Weak'), np.str_('Weak')]
+2026-08-05 23:59:54  DEBUG     [ml.prediction_service]  predict() called  features_count=12
+2026-08-05 23:59:54  DEBUG     [ml.prediction_service]  Feature validation passed  (12 features)
+2026-08-05 23:59:54  INFO      [ml.prediction_service]  Prediction: Moderate      confidence=0.6700  time=87.64 ms
+2026-08-05 23:59:54  DEBUG     [ml.prediction_service]  Probabilities: {'Very Weak': 0.08, 'Weak': 0.25, 'Moderate': 0.67, 'Strong': 0.0, 'Excellent': 0.0}

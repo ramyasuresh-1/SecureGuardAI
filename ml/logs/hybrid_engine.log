@@ -1,0 +1,100 @@
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  HybridDecisionEngine initialised  ML_HIGH=0.90  ML_LOW=0.70  rule_w=0.60  ml_w=0.40  breach_threshold=Moderate  critical_score=20
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Very Weak    score=50   ml=Very Weak    conf=0.80  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R1 Consensus: Very Weak
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Very Weak    source=Hybrid Consensus     agree=True  reason="Both the Rule Engine and Machine Learning model agree: 'Very"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=50   ml=Weak         conf=0.80  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R1 Consensus: Weak
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Weak         source=Hybrid Consensus     agree=True  reason="Both the Rule Engine and Machine Learning model agree: 'Weak"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Moderate     score=50   ml=Moderate     conf=0.80  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R1 Consensus: Moderate
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Moderate     source=Hybrid Consensus     agree=True  reason="Both the Rule Engine and Machine Learning model agree: 'Mode"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=50   ml=Strong       conf=0.80  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R1 Consensus: Strong
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Hybrid Consensus     agree=True  reason="Both the Rule Engine and Machine Learning model agree: 'Stro"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Excellent    score=50   ml=Excellent    conf=0.80  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R1 Consensus: Excellent
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Excellent    source=Hybrid Consensus     agree=True  reason="Both the Rule Engine and Machine Learning model agree: 'Exce"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Very Weak    score=20   ml=Strong       conf=0.95  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R2 ML High Confidence: rule=Very Weak ml=Strong conf=0.95
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Machine Learning     agree=False  reason="Engines disagreed (Rule: 'Very Weak', ML: 'Strong'). Machine"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=35   ml=Excellent    conf=0.93  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R2 ML High Confidence: rule=Weak ml=Excellent conf=0.93
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Excellent    source=Machine Learning     agree=False  reason="Engines disagreed (Rule: 'Weak', ML: 'Excellent'). Machine L"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Moderate     score=55   ml=Strong       conf=0.92  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R2 ML High Confidence: rule=Moderate ml=Strong conf=0.92
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Machine Learning     agree=False  reason="Engines disagreed (Rule: 'Moderate', ML: 'Strong'). Machine "
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=72   ml=Excellent    conf=0.91  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R2 ML High Confidence: rule=Strong ml=Excellent conf=0.91
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Excellent    source=Machine Learning     agree=False  reason="Engines disagreed (Rule: 'Strong', ML: 'Excellent'). Machine"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=75   ml=Excellent    conf=0.50  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R3 Rule Engine preferred: conf=0.50 < threshold=0.70
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Rule Engine          agree=False  reason="Engines disagreed (Rule: 'Strong', ML: 'Excellent'). Rule En"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Moderate     score=60   ml=Strong       conf=0.45  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R3 Rule Engine preferred: conf=0.45 < threshold=0.70
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Moderate     source=Rule Engine          agree=False  reason="Engines disagreed (Rule: 'Moderate', ML: 'Strong'). Rule Eng"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=38   ml=Moderate     conf=0.30  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R3 Rule Engine preferred: conf=0.30 < threshold=0.70
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Weak         source=Rule Engine          agree=False  reason="Engines disagreed (Rule: 'Weak', ML: 'Moderate'). Rule Engin"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Very Weak    score=15   ml=Weak         conf=0.60  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R3 Rule Engine preferred: conf=0.60 < threshold=0.70
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Very Weak    source=Rule Engine          agree=False  reason="Engines disagreed (Rule: 'Very Weak', ML: 'Weak'). Rule Engi"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=40   ml=Moderate     conf=0.75  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R4 Weighted blend: rule=Weak(rank=1) ml=Moderate(rank=2) blended=1.40 → Weak
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Weak         source=Weighted Decision    agree=False  reason='ML confidence (75%) is between the high-confidence threshold'
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Moderate     score=58   ml=Strong       conf=0.80  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R4 Weighted blend: rule=Moderate(rank=2) ml=Strong(rank=3) blended=2.40 → Moderate
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Moderate     source=Weighted Decision    agree=False  reason='ML confidence (80%) is between the high-confidence threshold'
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=75   ml=Moderate     conf=0.78  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R4 Weighted blend: rule=Strong(rank=3) ml=Moderate(rank=2) blended=2.60 → Strong
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Weighted Decision    agree=False  reason='ML confidence (78%) is between the high-confidence threshold'
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Moderate     score=60   ml=Moderate     conf=0.80  breached=True
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R0 Breach Guard applied  Moderate → Weak
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Weak         source=Breach Guard         agree=True  reason='Password found in breach dataset. Security level downgraded '
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=60   ml=Strong       conf=0.80  breached=True
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R0 Breach Guard applied  Strong → Moderate
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Moderate     source=Breach Guard         agree=True  reason='Password found in breach dataset. Security level downgraded '
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Excellent    score=60   ml=Excellent    conf=0.80  breached=True
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R0 Breach Guard applied  Excellent → Strong
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Breach Guard         agree=True  reason='Password found in breach dataset. Security level downgraded '
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Very Weak    score=10   ml=Very Weak    conf=0.95  breached=True
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R0 Breach Guard applied  Very Weak → Very Weak
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Very Weak    source=Breach Guard         agree=True  reason="Password found in breach dataset. Category remains 'Very Wea"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Moderate     score=55   ml=Strong       conf=0.90  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R2 ML High Confidence: rule=Moderate ml=Strong conf=0.90
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Machine Learning     agree=False  reason="Engines disagreed (Rule: 'Moderate', ML: 'Strong'). Machine "
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=38   ml=Moderate     conf=0.70  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R4 Weighted blend: rule=Weak(rank=1) ml=Moderate(rank=2) blended=1.40 → Weak
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Weak         source=Weighted Decision    agree=False  reason='ML confidence (70%) is between the high-confidence threshold'
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=38   ml=Moderate     conf=0.70  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R3 Rule Engine preferred: conf=0.70 < threshold=0.70
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Weak         source=Rule Engine          agree=False  reason="Engines disagreed (Rule: 'Weak', ML: 'Moderate'). Rule Engin"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Very Weak    score=19   ml=Strong       conf=0.95  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R2 ML High Confidence: rule=Very Weak ml=Strong conf=0.95
+2026-08-06 00:03:43  WARNING   [ml.hybrid_engine]  R5 Safety Guard: rule_score=19 < threshold=20  blocking upgrade Very Weak → Strong  reverting to Very Weak
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Very Weak    source=Rule Engine          agree=False  reason='Safety guard activated: rule score (19) is critically low (<'
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=20   ml=Strong       conf=0.95  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R2 ML High Confidence: rule=Weak ml=Strong conf=0.95
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Machine Learning     agree=False  reason="Engines disagreed (Rule: 'Weak', ML: 'Strong'). Machine Lear"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=SuperStrong  score=50   ml=Strong       conf=0.85  breached=False
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=101  ml=Strong       conf=0.85  breached=False
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=-1   ml=Strong       conf=0.85  breached=False
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=75   ml=Strong       conf=1.10  breached=False
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=75   ml=Strong       conf=-0.01  breached=False
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Moderate     score=60   ml=Moderate     conf=0.80  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R1 Consensus: Moderate
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Moderate     source=Hybrid Consensus     agree=True  reason="Both the Rule Engine and Machine Learning model agree: 'Mode"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=75   ml=Strong       conf=0.80  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R1 Consensus: Strong
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Hybrid Consensus     agree=True  reason="Both the Rule Engine and Machine Learning model agree: 'Stro"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=40   ml=Excellent    conf=0.95  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R2 ML High Confidence: rule=Weak ml=Excellent conf=0.95
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Excellent    source=Machine Learning     agree=False  reason="Engines disagreed (Rule: 'Weak', ML: 'Excellent'). Machine L"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=75   ml=Excellent    conf=0.50  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R3 Rule Engine preferred: conf=0.50 < threshold=0.70
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Strong       source=Rule Engine          agree=False  reason="Engines disagreed (Rule: 'Strong', ML: 'Excellent'). Rule En"
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Weak         score=38   ml=Moderate     conf=0.75  breached=False
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R4 Weighted blend: rule=Weak(rank=1) ml=Moderate(rank=2) blended=1.40 → Weak
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Weak         source=Weighted Decision    agree=False  reason='ML confidence (75%) is between the high-confidence threshold'
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ▶  rule=Strong       score=75   ml=Strong       conf=0.85  breached=True
+2026-08-06 00:03:43  DEBUG     [ml.hybrid_engine]  R0 Breach Guard applied  Strong → Moderate
+2026-08-06 00:03:43  INFO      [ml.hybrid_engine]  decide() ◀  final=Moderate     source=Breach Guard         agree=True  reason='Password found in breach dataset. Security level downgraded '
