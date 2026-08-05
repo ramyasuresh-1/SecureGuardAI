@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Reports | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" data-aos="fade-up">
+  <div class="page-header">
+    <div>
+      <p class="text-accent mb-1 fw-semibold">Reports</p>
+      <h2 class="fw-bold mb-0">Downloadable Executive Summaries</h2>
+    </div>
+  </div>
+
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="glass-card p-4">
+        <h5 class="fw-semibold mb-3">Quarterly Security Review</h5>
+        <p class="text-muted">Detailed trend summary with posture changes and action items.</p>
+        <button class="btn btn-accent"><i class="fa-solid fa-download me-2"></i>Download PDF</button>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="glass-card p-4">
+        <h5 class="fw-semibold mb-3">Password Exposure Audit</h5>
+        <p class="text-muted">Executive overview of weak patterns, entropy, and remediation status.</p>
+        <button class="btn btn-accent"><i class="fa-solid fa-download me-2"></i>Download CSV</button>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

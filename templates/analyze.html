@@ -1,0 +1,346 @@
+{% extends "base.html" %}
+
+{% block title %}Password Analyzer | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  {# ── Page Header ─────────────────────────────────────────────────────── #}
+  <div class="page-header mb-4" data-aos="fade-down">
+    <div>
+      <p class="text-accent mb-1 fw-semibold">Password Analyzer</p>
+      <h2 class="fw-bold mb-0">Interactive Security Diagnostics</h2>
+    </div>
+    <a href="{{ url_for('auth.history') }}" class="btn btn-outline-light">
+      <i class="fas fa-history me-2"></i>View History
+    </a>
+  </div>
+
+  {# ── Input Row ────────────────────────────────────────────────────────── #}
+  <div class="row g-4 mb-4">
+
+    {# Left: Input form — preserves existing form layout exactly #}
+    <div class="col-lg-7" data-aos="fade-up">
+      <div class="glass-card p-4">
+        <h5 class="fw-semibold mb-3">What-if Analyzer</h5>
+
+        <div class="mb-3">
+          <label class="form-label">Password Candidate</label>
+          <div class="input-group">
+            <input id="pwdInput"
+                   class="form-control"
+                   type="password"
+                   placeholder="Enter password to analyse"
+                   autocomplete="off" />
+            <button class="btn btn-outline-light"
+                    type="button"
+                    id="toggleVisBtn"
+                    title="Show / hide password">
+              <i class="fas fa-eye" id="toggleVisIcon"></i>
+            </button>
+          </div>
+          {# Live strength bar under the input #}
+          <div class="analyzer-strength-bar mt-2">
+            <div class="analyzer-strength-fill" id="strengthBarFill"></div>
+          </div>
+          <small class="text-muted" id="strengthBarLabel">&nbsp;</small>
+        </div>
+
+        <div class="row g-3">
+          <div class="col-md-6">
+            <label class="form-label">Complexity Shift</label>
+            <select class="form-select" id="complexitySelect">
+              <option value="Standard">Standard</option>
+              <option value="High Entropy">High Entropy</option>
+              <option value="Passphrase">Passphrase</option>
+            </select>
+          </div>
+          <div class="col-md-6">
+            <label class="form-label">Threat Model</label>
+            <select class="form-select" id="threatModelSelect">
+              <option value="Consumer">Consumer</option>
+              <option value="Enterprise">Enterprise</option>
+              <option value="Critical Systems">Critical Systems</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3 mt-3">
+          <button class="btn btn-accent" id="simulateBtn" type="button">
+            <i class="fas fa-bolt me-2"></i>Simulate
+          </button>
+          <button class="btn btn-outline-light" id="clearBtn" type="button">
+            <i class="fas fa-times me-2"></i>Clear
+          </button>
+          <span id="spinnerWrap" class="d-none">
+            <span class="spinner-border spinner-border-sm text-accent me-1"></span>
+            <small class="text-muted">Analysing…</small>
+          </span>
+        </div>
+
+        {# Error banner #}
+        <div id="errorBanner" class="alert alert-danger mt-3 d-none" role="alert">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <span id="errorMsg"></span>
+        </div>
+      </div>
+    </div>
+
+    {# Right: live KPI cards (hidden until first analysis) #}
+    <div class="col-lg-5" data-aos="fade-up" data-aos-delay="100">
+      <div id="kpiPanel" class="analyzer-kpi-grid d-none">
+
+        <div class="analyzer-kpi-card">
+          <div class="kpi-icon bg-gradient-primary"><i class="fas fa-shield-halved"></i></div>
+          <div>
+            <div class="kpi-label">Security Score</div>
+            <div class="kpi-value" id="kpiScore">—</div>
+          </div>
+        </div>
+
+        <div class="analyzer-kpi-card">
+          <div class="kpi-icon bg-gradient-success"><i class="fas fa-lock"></i></div>
+          <div>
+            <div class="kpi-label">Strength</div>
+            <div class="kpi-value" id="kpiStrength">—</div>
+          </div>
+        </div>
+
+        <div class="analyzer-kpi-card">
+          <div class="kpi-icon bg-gradient-danger"><i class="fas fa-fire"></i></div>
+          <div>
+            <div class="kpi-label">Threat Level</div>
+            <div class="kpi-value" id="kpiThreat">—</div>
+          </div>
+        </div>
+
+        <div class="analyzer-kpi-card">
+          <div class="kpi-icon bg-gradient-info"><i class="fas fa-chart-bar"></i></div>
+          <div>
+            <div class="kpi-label">Entropy</div>
+            <div class="kpi-value" id="kpiEntropy">—</div>
+          </div>
+        </div>
+
+        <div class="analyzer-kpi-card">
+          <div class="kpi-icon bg-gradient-warning"><i class="fas fa-clock"></i></div>
+          <div>
+            <div class="kpi-label">Crack Time (offline)</div>
+            <div class="kpi-value" id="kpiCrack">—</div>
+          </div>
+        </div>
+
+        <div class="analyzer-kpi-card">
+          <div class="kpi-icon bg-gradient-purple"><i class="fas fa-globe"></i></div>
+          <div>
+            <div class="kpi-label">Crack Time (online)</div>
+            <div class="kpi-value" id="kpiCrackOnline">—</div>
+          </div>
+        </div>
+
+      </div>
+
+      {# Placeholder shown before first run #}
+      <div id="kpiPlaceholder" class="glass-card p-4 h-100 d-flex flex-column align-items-center justify-content-center text-center">
+        <i class="fas fa-bolt fa-3x text-accent mb-3 opacity-50"></i>
+        <h6 class="text-muted">Enter a password and press Simulate</h6>
+        <p class="text-muted small mb-0">Results will appear here instantly.</p>
+      </div>
+    </div>
+
+  </div>{# /Input Row #}
+
+  {# ── Results Section (hidden until analysis) ─────────────────────────── #}
+  <div id="resultsSection" class="d-none">
+
+    {# Score Gauge + Strength Bar #}
+    <div class="row g-4 mb-4">
+      <div class="col-lg-4" data-aos="fade-up">
+        <div class="glass-card p-4 text-center">
+          <h5 class="fw-semibold mb-3">Security Score</h5>
+          <div class="score-gauge-wrap">
+            <canvas id="scoreGaugeChart" width="200" height="200"></canvas>
+            <div class="score-gauge-label">
+              <span id="gaugeScoreText" class="score-number">—</span>
+              <small class="text-muted d-block">/100</small>
+            </div>
+          </div>
+          <div class="mt-3">
+            <span id="strengthBadge" class="badge fs-6 px-3 py-2">—</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-lg-8" data-aos="fade-up" data-aos-delay="100">
+        <div class="glass-card p-4 h-100">
+          <h5 class="fw-semibold mb-4">Feature Summary</h5>
+          <div id="featureSummary" class="feature-grid"></div>
+        </div>
+      </div>
+    </div>
+
+    {# Findings + Radar #}
+    <div class="row g-4 mb-4">
+      <div class="col-lg-6" data-aos="fade-up">
+        <div class="glass-card p-4">
+          <h5 class="fw-semibold mb-3">
+            <i class="fas fa-robot text-accent me-2"></i>AI Findings
+          </h5>
+          <div id="findingsList"></div>
+        </div>
+      </div>
+
+      <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+        <div class="glass-card p-4">
+          <h5 class="fw-semibold mb-3">Password Composition Radar</h5>
+          <div style="position:relative;height:280px;">
+            <canvas id="analyzerRadarChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# Crack Time Panel #}
+    <div class="row g-4 mb-4">
+      <div class="col-12" data-aos="fade-up">
+        <div class="glass-card p-4">
+          <h5 class="fw-semibold mb-3">
+            <i class="fas fa-hourglass-half text-accent me-2"></i>Estimated Crack Time
+          </h5>
+          <div class="row g-3 text-center" id="crackTimeRow">
+            <div class="col-md-4">
+              <div class="crack-time-box">
+                <div class="crack-time-model">Offline Attack</div>
+                <div class="crack-time-value" id="ctOffline">—</div>
+                <small class="text-muted">GPU / 10⁹ guesses/sec</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="crack-time-box">
+                <div class="crack-time-model">Online Attack</div>
+                <div class="crack-time-value" id="ctOnline">—</div>
+                <small class="text-muted">Throttled / 100 guesses/sec</small>
+              </div>
+            </div>
+            <div class="col-md-4">
+              <div class="crack-time-box">
+                <div class="crack-time-model">Combinations</div>
+                <div class="crack-time-value" id="ctCombos">—</div>
+                <small class="text-muted">Estimated keyspace</small>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    {# ── Breach Detection Result ──────────────────────────────────────────── #}
+    <div class="row g-4 mb-4">
+      <div class="col-12" data-aos="fade-up">
+        <div id="breachPanel" class="glass-card p-4">
+
+          {# Breached — red alert #}
+          <div id="breachAlert" class="d-none">
+            <div class="breach-header breach-header--danger mb-3">
+              <i class="fas fa-radiation fa-lg me-2"></i>
+              <span class="fw-bold fs-5">Breach Detected</span>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-sm-4">
+                <div class="breach-meta-item">
+                  <div class="breach-meta-label">Breach Status</div>
+                  <div class="breach-meta-value text-danger fw-bold">
+                    <i class="fas fa-times-circle me-1"></i>COMPROMISED
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="breach-meta-item">
+                  <div class="breach-meta-label">Risk Level</div>
+                  <div class="breach-meta-value fw-bold" id="breachRiskValue">—</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="breach-meta-item">
+                  <div class="breach-meta-label">Source</div>
+                  <div class="breach-meta-value" id="breachSourceValue">—</div>
+                </div>
+              </div>
+            </div>
+            {# AI Recommendation #}
+            <div class="breach-recommendation">
+              <i class="fas fa-robot text-accent me-2"></i>
+              <span class="fw-semibold text-accent me-1">AI Recommendation:</span>
+              <span id="breachRecommendation">—</span>
+            </div>
+          </div>
+
+          {# Not breached — green success #}
+          <div id="breachSafe" class="d-none">
+            <div class="breach-header breach-header--success mb-3">
+              <i class="fas fa-shield-check fa-lg me-2"></i>
+              <span class="fw-bold fs-5">Not Found in Breach Database</span>
+            </div>
+            <div class="row g-3 mb-3">
+              <div class="col-sm-4">
+                <div class="breach-meta-item">
+                  <div class="breach-meta-label">Breach Status</div>
+                  <div class="breach-meta-value text-success fw-bold">
+                    <i class="fas fa-check-circle me-1"></i>SAFE
+                  </div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="breach-meta-item">
+                  <div class="breach-meta-label">Risk Level</div>
+                  <div class="breach-meta-value text-success fw-bold">Safe</div>
+                </div>
+              </div>
+              <div class="col-sm-4">
+                <div class="breach-meta-item">
+                  <div class="breach-meta-label">Source</div>
+                  <div class="breach-meta-value" id="breachSourceSafe">—</div>
+                </div>
+              </div>
+            </div>
+            <div class="breach-recommendation breach-recommendation--safe">
+              <i class="fas fa-robot text-success me-2"></i>
+              <span class="fw-semibold text-success me-1">AI Recommendation:</span>
+              This password has not been found in known breach databases.
+              Continue monitoring regularly and never reuse it across services.
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>{# /Breach Panel #}
+
+    {# Saved confirmation #}
+    <div class="row g-4 mb-4">
+      <div class="col-12" data-aos="fade-up">
+        <div id="savedBanner" class="glass-card p-3 d-flex align-items-center gap-3 border-success-subtle">
+          <i class="fas fa-check-circle text-success fs-4"></i>
+          <div>
+            <strong class="text-success">Analysis saved to history.</strong>
+            <span class="text-muted small ms-2" id="savedLabel"></span>
+          </div>
+          <a href="{{ url_for('auth.history') }}"
+             class="btn btn-outline-light btn-sm ms-auto">
+            <i class="fas fa-history me-1"></i>View History
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>{# /resultsSection #}
+
+</div>{# /container-fluid #}
+
+{# Pass API URL to JS via data attribute #}
+<div id="analyzerData"
+     data-analyze-url="{{ url_for('auth.api_analyze') }}"
+     data-dashboard-url="{{ url_for('auth.api_charts_all') }}"
+     style="display:none;"></div>
+
+<script src="{{ url_for('static', filename='js/analyzer.js') }}"></script>
+{% endblock %}

@@ -1,0 +1,108 @@
+{
+  "accuracy": 1.0,
+  "macro_precision": 1.0,
+  "macro_recall": 1.0,
+  "macro_f1": 1.0,
+  "weighted_f1": 1.0,
+  "cv_mean_accuracy": 1.0,
+  "cv_std_accuracy": 0.0,
+  "cv_scores": [
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+  ],
+  "per_class_report": {
+    "Excellent": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 120
+    },
+    "Moderate": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 120
+    },
+    "Strong": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 120
+    },
+    "Very Weak": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 120
+    },
+    "Weak": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1_score": 1.0,
+      "support": 120
+    }
+  },
+  "confusion_matrix": [
+    [
+      120,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      120,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      120,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      120,
+      0
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      120
+    ]
+  ],
+  "class_names": [
+    "Excellent",
+    "Moderate",
+    "Strong",
+    "Very Weak",
+    "Weak"
+  ],
+  "feature_importances": {
+    "password_length": 0.261012,
+    "unique_character_count": 0.241285,
+    "entropy": 0.214307,
+    "special_character_count": 0.091625,
+    "uppercase_count": 0.067304,
+    "lowercase_count": 0.066979,
+    "digit_count": 0.028203,
+    "repeated_character_count": 0.01571,
+    "char_diversity": 0.012665,
+    "dictionary_word": 0.000613,
+    "keyboard_pattern": 0.000182,
+    "sequential_chars": 0.000114
+  },
+  "test_size": 600,
+  "train_size": 2400
+}

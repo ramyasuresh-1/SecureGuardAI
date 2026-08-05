@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="SecureGuard AI - AI-powered password strength analyzer with breach detection and personalized recommendations." />
+  <title>{% block title %}SecureGuard AI{% endblock %}</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" rel="stylesheet" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.2/font/bootstrap-icons.css" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet" />
+  <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet" />
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+</head>
+<body class="dark-theme">
+  {% set authenticated = current_user.is_authenticated %}
+  
+  {% if authenticated %}
+  <div class="app-shell">
+    <aside class="sidebar glass-card" id="sidebarPanel">
+      <div class="p-4 border-bottom border-secondary-subtle">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="{{ url_for('auth.dashboard') }}">
+          <i class="fa-solid fa-shield-halved me-2 text-accent"></i>
+          <span>SecureGuard AI</span>
+        </a>
+      </div>
+      <div class="p-4">
+        <div class="profile-card mb-4">
+          <div class="avatar-circle mb-2">
+            {{ current_user.full_name[0].upper() if current_user.full_name else 'U' }}
+          </div>
+          <h6 class="mb-1">{{ current_user.full_name }}</h6>
+          <p class="text-muted small mb-0">{{ current_user.role.title() }}</p>
+        </div>
+        <ul class="nav flex-column gap-2">
+          <li><a class="sidebar-link{% if request.endpoint == 'auth.dashboard' %} active{% endif %}" href="{{ url_for('auth.dashboard') }}"><i class="fas fa-home me-2"></i>Dashboard</a></li>
+          <li><a class="sidebar-link{% if request.endpoint == 'auth.analyzer' %} active{% endif %}" href="{{ url_for('auth.analyzer') }}"><i class="fas fa-lock me-2"></i>Password Analyzer</a></li>
+          <li><a class="sidebar-link" href="#"><i class="fas fa-exclamation-triangle me-2"></i>Breach Detection</a></li>
+          <li><a class="sidebar-link" href="#"><i class="fas fa-robot me-2"></i>AI Security Coach</a></li>
+          <li><a class="sidebar-link{% if request.endpoint == 'auth.analytics' %} active{% endif %}" href="{{ url_for('auth.analytics') }}"><i class="fas fa-chart-bar me-2"></i>Analytics</a></li>
+          <li><a class="sidebar-link{% if request.endpoint == 'auth.reports' %} active{% endif %}" href="{{ url_for('auth.reports') }}"><i class="fas fa-file-alt me-2"></i>Reports</a></li>
+          <li><a class="sidebar-link{% if request.endpoint == 'auth.history' %} active{% endif %}" href="{{ url_for('auth.history') }}"><i class="fas fa-history me-2"></i>History</a></li>
+          <li><a class="sidebar-link{% if request.endpoint == 'auth.settings' %} active{% endif %}" href="{{ url_for('auth.settings') }}"><i class="fas fa-cog me-2"></i>Settings</a></li>
+          <li><a class="sidebar-link" href="{{ url_for('auth.logout') }}"><i class="fas fa-sign-out-alt me-2"></i>Logout</a></li>
+        </ul>
+      </div>
+    </aside>
+
+    <div class="main-panel">
+      <nav class="topbar glass-card">
+        <div class="d-flex justify-content-between align-items-center w-100">
+
+          {# Left: mobile hamburger + welcome text #}
+          <div class="d-flex align-items-center gap-3">
+            <button class="btn btn-outline-light d-lg-none" type="button" data-sidebar-toggle>
+              <i class="fa-solid fa-bars"></i>
+            </button>
+            <div class="d-none d-md-block">
+              <span class="text-muted small">Welcome back, </span>
+              <span class="fw-semibold text-accent">{{ current_user.full_name }}</span>
+            </div>
+          </div>
+
+          {# Right: controls #}
+          <div class="d-flex align-items-center gap-2">
+
+            {# Notification bell with badge #}
+            <div class="dropdown">
+              <button class="icon-btn position-relative"
+                      type="button"
+                      id="notifDropdown"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false"
+                      aria-label="Notifications">
+                <i class="fa-solid fa-bell"></i>
+                {# notif_count is passed by every authenticated route #}
+                {% set _cnt = notif_count | default(0) %}
+                {% if _cnt > 0 %}
+                <span class="notif-badge">{{ _cnt }}</span>
+                {% endif %}
+              </button>
+
+              <ul class="dropdown-menu dropdown-menu-end glass-card notif-dropdown"
+                  aria-labelledby="notifDropdown"
+                  style="min-width:320px;max-width:360px;">
+
+                <li class="px-3 pt-2 pb-1 d-flex justify-content-between align-items-center">
+                  <strong class="small">Notifications</strong>
+                  {% if _cnt > 0 %}
+                  <span class="badge bg-danger">{{ _cnt }} new</span>
+                  {% else %}
+                  <span class="badge bg-secondary">All clear</span>
+                  {% endif %}
+                </li>
+                <li><hr class="dropdown-divider my-1" /></li>
+
+                {# Render up to 6 notification items from the route context #}
+                {% set notifs = notifications | default([]) %}
+                {% if notifs %}
+                  {% for n in notifs %}
+                  <li>
+                    <div class="dropdown-item notif-item {{ 'notif-unread' if n.unread else '' }}">
+                      <div class="d-flex align-items-start gap-2">
+                        <div class="notif-icon {{ n.icon_bg }}">
+                          <i class="{{ n.icon }}"></i>
+                        </div>
+                        <div class="flex-grow-1 overflow-hidden">
+                          <div class="fw-semibold small text-truncate">{{ n.title }}</div>
+                          <div class="text-muted" style="font-size:0.72rem;">{{ n.sub }}</div>
+                          <div class="text-muted" style="font-size:0.68rem;">{{ n.time_ago }}</div>
+                        </div>
+                      </div>
+                    </div>
+                  </li>
+                  {% endfor %}
+                {% else %}
+                  <li>
+                    <div class="dropdown-item text-center text-muted small py-3">
+                      <i class="fas fa-check-circle text-success me-1"></i>
+                      No new notifications
+                    </div>
+                  </li>
+                {% endif %}
+
+                <li><hr class="dropdown-divider my-1" /></li>
+                <li>
+                  <a class="dropdown-item small text-center text-accent py-2"
+                     href="{{ url_for('auth.history') }}">
+                    View full history <i class="fas fa-arrow-right ms-1"></i>
+                  </a>
+                </li>
+              </ul>
+            </div>{# /notif dropdown #}
+
+            {# Theme toggle #}
+            <button class="icon-btn" type="button" data-theme-toggle aria-label="Toggle theme">
+              <i class="fa-solid fa-moon"></i>
+            </button>
+
+            {# User profile dropdown #}
+            <div class="dropdown">
+              <button class="icon-btn dropdown-toggle d-flex align-items-center gap-2"
+                      type="button"
+                      data-bs-toggle="dropdown"
+                      aria-expanded="false">
+                <span class="topbar-avatar">
+                  {{ current_user.full_name[0].upper() if current_user.full_name else 'U' }}
+                </span>
+                <span class="d-none d-md-inline small fw-semibold">
+                  {{ current_user.full_name.split()[0] }}
+                </span>
+              </button>
+              <ul class="dropdown-menu dropdown-menu-end glass-card">
+                <li class="px-3 py-2">
+                  <div class="fw-semibold small">{{ current_user.full_name }}</div>
+                  <div class="text-muted" style="font-size:0.72rem;">{{ current_user.email }}</div>
+                </li>
+                <li><hr class="dropdown-divider my-1" /></li>
+                <li><a class="dropdown-item" href="{{ url_for('auth.profile') }}">
+                  <i class="fas fa-user me-2 text-accent"></i>Profile
+                </a></li>
+                <li><a class="dropdown-item" href="{{ url_for('auth.settings') }}">
+                  <i class="fas fa-cog me-2 text-accent"></i>Settings
+                </a></li>
+                <li><hr class="dropdown-divider my-1" /></li>
+                <li><a class="dropdown-item text-danger" href="{{ url_for('auth.logout') }}">
+                  <i class="fas fa-sign-out-alt me-2"></i>Logout
+                </a></li>
+              </ul>
+            </div>
+
+          </div>{# /right controls #}
+        </div>
+      </nav>
+
+      <main class="content-area">
+  {% else %}
+  <nav class="navbar navbar-expand-lg navbar-dark fixed-top glass-nav">
+    <div class="container">
+      <a class="navbar-brand fw-bold" href="{{ url_for('index') }}">
+        <i class="fa-solid fa-shield-halved me-2 text-accent"></i>SecureGuard AI
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="#about">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="#features">Features</a></li>
+          <li class="nav-item"><a class="nav-link" href="#tech-stack">Tech Stack</a></li>
+          <li class="nav-item"><a class="nav-link" href="{{ url_for('auth.login') }}">Login</a></li>
+          <li class="nav-item"><a class="btn btn-accent ms-2" href="{{ url_for('auth.register') }}">Register</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <main>
+  {% endif %}
+  
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <div class="{{ 'container-fluid px-4 pt-4' if authenticated else 'container mt-5 pt-5' }}">
+          {% for category, message in messages %}
+            <div class="alert alert-{{ category if category else 'info' }}{{ ' mt-3' if not authenticated else '' }}" role="alert">{{ message }}</div>
+          {% endfor %}
+        </div>
+      {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+  </main>
+
+  {% if authenticated %}
+      </main>
+    </div>
+  </div>
+  {% else %}
+  <footer class="footer-section py-5 mt-5">
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-6">
+          <h5 class="fw-bold">SecureGuard AI</h5>
+          <p class="text-muted mb-0">AI-powered password intelligence for modern teams.</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <a href="https://github.com" class="text-decoration-none me-3"><i class="fab fa-github"></i> GitHub</a>
+          <a href="mailto:contact@secureguard.ai" class="text-decoration-none"><i class="fas fa-envelope"></i> Email</a>
+        </div>
+      </div>
+      <div class="text-center mt-4 small text-muted">© 2026 SecureGuard AI. All rights reserved.</div>
+    </div>
+  </footer>
+  {% endif %}
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+  <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+  <script>
+    AOS.init({ duration: 800, once: true });
+  </script>
+</body>
+</html>

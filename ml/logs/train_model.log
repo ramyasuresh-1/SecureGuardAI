@@ -1,0 +1,99 @@
+2026-08-05 23:02:10  INFO      root  Log file → C:\Users\Ramya\SecureGuardAI\ml\logs\train_model.log
+2026-08-05 23:02:10  INFO      __main__  ════════════════════════════════════════════════════════════
+2026-08-05 23:02:10  INFO      __main__  SecureGuard AI — Password Strength Classifier Training
+2026-08-05 23:02:10  INFO      __main__  ════════════════════════════════════════════════════════════
+2026-08-05 23:02:10  INFO      ml.preprocess  =======================================================
+2026-08-05 23:02:10  INFO      ml.preprocess  Preprocessing pipeline started
+2026-08-05 23:02:10  INFO      ml.preprocess  Dataset : C:\Users\Ramya\SecureGuardAI\datasets\password_dataset.csv
+2026-08-05 23:02:10  INFO      ml.preprocess  =======================================================
+2026-08-05 23:02:10  INFO      ml.preprocess  Step 1  Loaded  : 3000 rows × 2 cols
+2026-08-05 23:02:10  INFO      ml.preprocess  Step 3  No missing values found
+2026-08-05 23:02:10  INFO      ml.preprocess  Step 4  No duplicates found
+2026-08-05 23:02:10  INFO      ml.preprocess  Step 5  Clean rows  : 3000
+2026-08-05 23:02:10  INFO      ml.preprocess           Very Weak   : 600
+2026-08-05 23:02:10  INFO      ml.preprocess           Weak        : 600
+2026-08-05 23:02:10  INFO      ml.preprocess           Moderate    : 600
+2026-08-05 23:02:10  INFO      ml.preprocess           Strong      : 600
+2026-08-05 23:02:10  INFO      ml.preprocess           Excellent   : 600
+2026-08-05 23:02:10  INFO      ml.preprocess  Step 6  Extracting features …
+2026-08-05 23:02:10  DEBUG     ml.feature_builder  Built feature matrix: shape=(3000, 12)
+2026-08-05 23:02:10  INFO      ml.preprocess  Step 6  Feature matrix shape: (3000, 12)
+2026-08-05 23:02:11  INFO      ml.preprocess  Step 7  Label encoding   : [np.str_('Excellent'), np.str_('Moderate'), np.str_('Strong'), np.str_('Very Weak'), np.str_('Weak')] → [0, 1, 2, 3, 4]
+2026-08-05 23:02:11  INFO      ml.preprocess  Step 8  Split: train=2400  test=600  (80/20)
+2026-08-05 23:02:11  INFO      ml.preprocess           Very Weak     train=480   test=120 
+2026-08-05 23:02:11  INFO      ml.preprocess           Weak          train=480   test=120 
+2026-08-05 23:02:11  INFO      ml.preprocess           Moderate      train=480   test=120 
+2026-08-05 23:02:11  INFO      ml.preprocess           Strong        train=480   test=120 
+2026-08-05 23:02:11  INFO      ml.preprocess           Excellent     train=480   test=120 
+2026-08-05 23:02:11  INFO      ml.preprocess  Preprocessing complete
+2026-08-05 23:02:11  INFO      ml.preprocess  =======================================================
+2026-08-05 23:02:11  INFO      __main__  Training set : 2400 rows   Test set : 600 rows
+2026-08-05 23:02:11  INFO      __main__  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:11  INFO      __main__  GridSearchCV  (quick grid, 16 combinations, 5-fold CV) …
+2026-08-05 23:02:11  INFO      __main__  This may take several minutes on the full grid.
+2026-08-05 23:02:25  INFO      __main__  GridSearchCV finished in 14.0 s
+2026-08-05 23:02:25  INFO      __main__  Best params  : {'class_weight': 'balanced', 'max_depth': None, 'max_features': 'sqrt', 'min_samples_leaf': 1, 'min_samples_split': 2, 'n_estimators': 100}
+2026-08-05 23:02:25  INFO      __main__  Best CV F1   : 1.0000
+2026-08-05 23:02:25  INFO      __main__  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:25  INFO      ml.evaluate  ============================================================
+2026-08-05 23:02:25  INFO      ml.evaluate  Model Evaluation
+2026-08-05 23:02:25  INFO      ml.evaluate  ============================================================
+2026-08-05 23:02:25  INFO      ml.evaluate  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:25  INFO      ml.evaluate    Accuracy          : 1.0000  (600 / 600 correct)
+2026-08-05 23:02:25  INFO      ml.evaluate    Macro Precision   : 1.0000
+2026-08-05 23:02:25  INFO      ml.evaluate    Macro Recall      : 1.0000
+2026-08-05 23:02:25  INFO      ml.evaluate    Macro F1          : 1.0000
+2026-08-05 23:02:25  INFO      ml.evaluate    Weighted F1       : 1.0000
+2026-08-05 23:02:25  INFO      ml.evaluate  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:25  INFO      ml.evaluate  Classification Report:
+2026-08-05 23:02:25  INFO      ml.evaluate                  precision    recall  f1-score   support
+2026-08-05 23:02:25  INFO      ml.evaluate    
+2026-08-05 23:02:25  INFO      ml.evaluate       Excellent       1.00      1.00      1.00       120
+2026-08-05 23:02:25  INFO      ml.evaluate        Moderate       1.00      1.00      1.00       120
+2026-08-05 23:02:25  INFO      ml.evaluate          Strong       1.00      1.00      1.00       120
+2026-08-05 23:02:25  INFO      ml.evaluate       Very Weak       1.00      1.00      1.00       120
+2026-08-05 23:02:25  INFO      ml.evaluate            Weak       1.00      1.00      1.00       120
+2026-08-05 23:02:25  INFO      ml.evaluate    
+2026-08-05 23:02:25  INFO      ml.evaluate        accuracy                           1.00       600
+2026-08-05 23:02:25  INFO      ml.evaluate       macro avg       1.00      1.00      1.00       600
+2026-08-05 23:02:25  INFO      ml.evaluate    weighted avg       1.00      1.00      1.00       600
+2026-08-05 23:02:25  INFO      ml.evaluate  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:25  INFO      ml.evaluate  Confusion Matrix (rows=actual, cols=predicted):
+2026-08-05 23:02:25  INFO      ml.evaluate               Excellent     Moderate       Strong    Very Weak         Weak
+2026-08-05 23:02:25  INFO      ml.evaluate  Excellent          120            0            0            0            0
+2026-08-05 23:02:25  INFO      ml.evaluate  Moderate             0          120            0            0            0
+2026-08-05 23:02:25  INFO      ml.evaluate  Strong               0            0          120            0            0
+2026-08-05 23:02:25  INFO      ml.evaluate  Very Weak            0            0            0          120            0
+2026-08-05 23:02:25  INFO      ml.evaluate  Weak                 0            0            0            0          120
+2026-08-05 23:02:25  INFO      ml.evaluate  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:25  INFO      ml.evaluate  Cross-Validation (5-fold, metric=accuracy) …
+2026-08-05 23:02:25  INFO      ml.evaluate    CV scores : 1.0000  1.0000  1.0000  1.0000  1.0000
+2026-08-05 23:02:25  INFO      ml.evaluate    CV mean   : 1.0000  (± 0.0000)
+2026-08-05 23:02:25  INFO      ml.evaluate  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:25  INFO      ml.evaluate  Feature Importances (ranked):
+2026-08-05 23:02:25  INFO      ml.evaluate     1. password_length                 0.2610  ██████████
+2026-08-05 23:02:25  INFO      ml.evaluate     2. unique_character_count          0.2413  █████████
+2026-08-05 23:02:25  INFO      ml.evaluate     3. entropy                         0.2143  ████████
+2026-08-05 23:02:25  INFO      ml.evaluate     4. special_character_count         0.0916  ███
+2026-08-05 23:02:25  INFO      ml.evaluate     5. uppercase_count                 0.0673  ██
+2026-08-05 23:02:25  INFO      ml.evaluate     6. lowercase_count                 0.0670  ██
+2026-08-05 23:02:25  INFO      ml.evaluate     7. digit_count                     0.0282  █
+2026-08-05 23:02:25  INFO      ml.evaluate     8. repeated_character_count        0.0157  
+2026-08-05 23:02:25  INFO      ml.evaluate     9. char_diversity                  0.0127  
+2026-08-05 23:02:25  INFO      ml.evaluate    10. dictionary_word                 0.0006  
+2026-08-05 23:02:25  INFO      ml.evaluate    11. keyboard_pattern                0.0002  
+2026-08-05 23:02:25  INFO      ml.evaluate    12. sequential_chars                0.0001  
+2026-08-05 23:02:25  INFO      ml.evaluate  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:25  INFO      ml.evaluate  Metrics saved → C:\Users\Ramya\SecureGuardAI\ml\artifacts\metrics.json
+2026-08-05 23:02:25  INFO      ml.evaluate  ============================================================
+2026-08-05 23:02:25  INFO      __main__  ────────────────────────────────────────────────────────────
+2026-08-05 23:02:25  INFO      __main__  Model saved   → C:\Users\Ramya\SecureGuardAI\ml\artifacts\password_strength_model.pkl
+2026-08-05 23:02:25  INFO      __main__  Encoder saved → C:\Users\Ramya\SecureGuardAI\ml\artifacts\label_encoder.pkl
+2026-08-05 23:02:25  INFO      __main__  Columns saved → C:\Users\Ramya\SecureGuardAI\ml\artifacts\feature_columns.pkl
+2026-08-05 23:02:25  INFO      __main__  Metrics saved → C:\Users\Ramya\SecureGuardAI\ml\artifacts\metrics.json
+2026-08-05 23:02:25  INFO      __main__  ════════════════════════════════════════════════════════════
+2026-08-05 23:02:25  INFO      __main__  Training complete in 15.1 s
+2026-08-05 23:02:25  INFO      __main__    Accuracy   : 1.0000
+2026-08-05 23:02:25  INFO      __main__    Macro F1   : 1.0000
+2026-08-05 23:02:25  INFO      __main__    CV Accuracy: 1.0000  (± 0.0000)
+2026-08-05 23:02:25  INFO      __main__  ════════════════════════════════════════════════════════════

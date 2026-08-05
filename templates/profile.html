@@ -1,0 +1,171 @@
+{% extends "base.html" %}
+
+{% block title %}Profile | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" data-aos="fade-up">
+  <div class="row g-4">
+
+    {# ── Left: Identity Card ───────────────────────────────────────────────── #}
+    <div class="col-lg-4">
+      <div class="glass-card p-4 text-center h-100">
+
+        <div class="avatar-circle mx-auto mb-3" style="font-size:2rem;width:80px;height:80px;">
+          {{ current_user.full_name[0].upper() if current_user.full_name else 'U' }}
+        </div>
+
+        <h4 class="fw-bold mb-1">{{ current_user.full_name }}</h4>
+        <p class="text-muted mb-2">{{ current_user.email }}</p>
+        <span class="badge-soft text-capitalize mb-3 d-inline-block">
+          {{ current_user.role }}
+        </span>
+
+        <hr class="border-secondary-subtle my-3" />
+
+        {# Quick stat pills #}
+        <div class="row g-2 text-center">
+          <div class="col-4">
+            <div class="glass-card p-2">
+              <div class="fw-bold text-accent fs-5">{{ stats.total }}</div>
+              <div class="text-muted" style="font-size:0.7rem;">Analyses</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="glass-card p-2">
+              <div class="fw-bold text-success fs-5">{{ stats.strong }}</div>
+              <div class="text-muted" style="font-size:0.7rem;">Strong</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="glass-card p-2">
+              <div class="fw-bold {{ 'text-danger' if stats.weak > 0 else 'text-muted' }} fs-5">
+                {{ stats.weak }}
+              </div>
+              <div class="text-muted" style="font-size:0.7rem;">Weak</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    {# ── Right: Details + stats ────────────────────────────────────────────── #}
+    <div class="col-lg-8">
+      <div class="glass-card p-4">
+
+        <h4 class="fw-bold mb-4">Profile Overview</h4>
+
+        <div class="row g-3 mb-4">
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Full Name</p>
+            <strong>{{ current_user.full_name }}</strong>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Email</p>
+            <strong>{{ current_user.email }}</strong>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Role</p>
+            <strong class="text-capitalize">{{ current_user.role }}</strong>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Member Since</p>
+            <strong>{{ current_user.created_at.strftime('%B %d, %Y') }}</strong>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Last Login</p>
+            <strong>
+              {{ current_user.last_login.strftime('%Y-%m-%d %H:%M') if current_user.last_login else 'No record' }}
+            </strong>
+          </div>
+          <div class="col-md-6">
+            <p class="text-muted small mb-1">Account Status</p>
+            <span class="badge {{ 'bg-success' if current_user.is_active else 'bg-danger' }}">
+              {{ 'Active' if current_user.is_active else 'Inactive' }}
+            </span>
+          </div>
+        </div>
+
+        <hr class="border-secondary-subtle my-4" />
+
+        {# ── Live security stats ───────────────────────────────────────────── #}
+        <h5 class="fw-semibold mb-3">Security Statistics</h5>
+        <div class="row g-3">
+
+          <div class="col-md-4">
+            <div class="metric-card text-center p-3">
+              <div class="metric-value">{{ stats.total }}</div>
+              <div class="text-muted small mt-1">Total Scans</div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="metric-card text-center p-3">
+              <div class="metric-value {{ 'text-danger' if stats.weak > 0 else 'text-success' }}">
+                {{ stats.weak }}
+              </div>
+              <div class="text-muted small mt-1">Weak Passwords</div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="metric-card text-center p-3">
+              <div class="metric-value text-accent">
+                {{ stats.avg_score if stats.total > 0 else '—' }}
+                {% if stats.total > 0 %}<span class="text-muted fs-6">/100</span>{% endif %}
+              </div>
+              <div class="text-muted small mt-1">Avg Score</div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="metric-card text-center p-3">
+              <div class="metric-value text-success">{{ stats.strong }}</div>
+              <div class="text-muted small mt-1">Strong Passwords</div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="metric-card text-center p-3">
+              <div class="metric-value {{ 'text-danger' if stats.breached > 0 else 'text-muted' }}">
+                {{ stats.breached }}
+              </div>
+              <div class="text-muted small mt-1">Breached</div>
+            </div>
+          </div>
+
+          <div class="col-md-4">
+            <div class="metric-card text-center p-3">
+              <div class="metric-value
+                {% if stats.threat_level == 'Critical' %}text-danger
+                {% elif stats.threat_level == 'High' %}text-warning
+                {% elif stats.threat_level == 'Medium' %}text-info
+                {% else %}text-success{% endif %}"
+                style="font-size:1.2rem;">
+                {{ stats.threat_level }}
+              </div>
+              <div class="text-muted small mt-1">Threat Level</div>
+            </div>
+          </div>
+
+        </div>
+
+        {# Action buttons #}
+        <div class="d-flex gap-3 mt-4 flex-wrap">
+          <a href="{{ url_for('auth.history') }}" class="btn btn-accent">
+            <i class="fas fa-history me-2"></i>View History
+          </a>
+          <a href="{{ url_for('auth.settings') }}" class="btn btn-outline-light">
+            <i class="fas fa-cog me-2"></i>Settings
+          </a>
+          <a href="{{ url_for('auth.analyzer') }}" class="btn btn-outline-light">
+            <i class="fas fa-shield-halved me-2"></i>Analyse Password
+          </a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

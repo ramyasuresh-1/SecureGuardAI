@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+
+{% block title %}Settings | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4" data-aos="fade-up">
+  <div class="page-header">
+    <div>
+      <p class="text-accent mb-1 fw-semibold">Preferences</p>
+      <h2 class="fw-bold mb-0">Workspace Settings</h2>
+    </div>
+  </div>
+  <div class="row g-4">
+    <div class="col-lg-6">
+      <div class="glass-card p-4">
+        <h4 class="fw-bold mb-3">Visual Preferences</h4>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" checked />
+          <label class="form-check-label">Dark mode</label>
+        </div>
+        <div class="form-check form-switch mb-3">
+          <input class="form-check-input" type="checkbox" checked />
+          <label class="form-check-label">Notifications</label>
+        </div>
+        <div class="form-check form-switch">
+          <input class="form-check-input" type="checkbox" />
+          <label class="form-check-label">Compact layout</label>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-6">
+      <div class="glass-card p-4">
+        <h4 class="fw-bold mb-3">Change Password</h4>
+        <form>
+          <div class="mb-3">
+            <label class="form-label">Current Password</label>
+            <input class="form-control" type="password" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">New Password</label>
+            <input class="form-control" type="password" />
+          </div>
+          <div class="mb-3">
+            <label class="form-label">Confirm Password</label>
+            <input class="form-control" type="password" />
+          </div>
+          <button class="btn btn-accent">Update Password</button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

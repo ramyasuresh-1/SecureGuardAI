@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Login | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="auth-page py-5">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-5">
+        <div class="glass-card p-4 p-md-5 login-card">
+          <div class="text-center mb-4">
+            <i class="fa-solid fa-fingerprint fa-2x text-accent"></i>
+            <h2 class="fw-bold mt-3 mb-2">Welcome Back</h2>
+            <p class="text-muted">Sign in to continue protecting your digital identity.</p>
+          </div>
+          <form method="post" class="needs-validation" novalidate>
+            {{ form.hidden_tag() }}
+            <div class="mb-3">
+              {{ form.email.label(class="form-label") }}
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                {{ form.email(class="form-control", placeholder="name@example.com") }}
+              </div>
+            </div>
+            <div class="mb-3">
+              {{ form.password.label(class="form-label") }}
+              <div class="input-group">
+                <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                {{ form.password(class="form-control", id="login_password", placeholder="Enter password") }}
+                <button class="btn btn-outline-light password-toggle" type="button" data-target="login_password"><i class="fa-solid fa-eye"></i></button>
+              </div>
+            </div>
+            <div class="d-flex justify-content-between align-items-center mb-3">
+              <div class="form-check">
+                {{ form.remember_me(class="form-check-input") }}
+                {{ form.remember_me.label(class="form-check-label") }}
+              </div>
+              <a href="#" class="small text-accent text-decoration-none">Forgot Password</a>
+            </div>
+            {{ form.submit(class="btn btn-accent w-100") }}
+          </form>
+          <div class="text-center mt-3 small text-muted">
+            No account yet? <a href="{{ url_for('auth.register') }}" class="text-accent">Register</a>
+          </div>
+          <div class="forgot-password-box mt-4 p-3 rounded-3">
+            <i class="fa-solid fa-circle-info me-2 text-accent"></i>
+            <span>Forgot Password</span>
+            <p class="mb-0 mt-2 small text-muted">This feature will be available in the next version.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

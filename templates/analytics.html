@@ -1,0 +1,492 @@
+{% extends "base.html" %}
+
+{% block title %}Analytics | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  {# ── Page Header ─────────────────────────────────────────────────────────── #}
+  <div class="page-header mb-4" data-aos="fade-down">
+    <div>
+      <h2 class="mb-1 fw-bold">Analytics</h2>
+      <p class="text-muted mb-0">Comprehensive password security metrics and trends</p>
+    </div>
+  </div>
+
+  {# ── KPI Cards ────────────────────────────────────────────────────────────── #}
+  <div class="row g-3 mb-4">
+
+    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="50">
+      <div class="glass-card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <p class="text-muted small mb-1">Total Passwords</p>
+            <h3 class="mb-0 fw-bold">{{ stats.total }}</h3>
+          </div>
+          <div class="text-accent" style="font-size:1.8rem;">
+            <i class="fas fa-key"></i>
+          </div>
+        </div>
+        <small class="text-muted">All-time analyses</small>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="100">
+      <div class="glass-card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <p class="text-muted small mb-1">Strong Passwords</p>
+            <h3 class="mb-0 fw-bold">{{ stats.strong }}</h3>
+          </div>
+          <div class="text-success" style="font-size:1.8rem;">
+            <i class="fas fa-shield-check"></i>
+          </div>
+        </div>
+        <small class="text-success">{{ stats.strong_pct }}% of total</small>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="150">
+      <div class="glass-card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <p class="text-muted small mb-1">Weak Passwords</p>
+            <h3 class="mb-0 fw-bold">{{ stats.weak }}</h3>
+          </div>
+          <div class="text-warning" style="font-size:1.8rem;">
+            <i class="fas fa-exclamation-triangle"></i>
+          </div>
+        </div>
+        <small class="{{ 'text-warning' if stats.weak > 0 else 'text-muted' }}">
+          {{ stats.weak_pct }}% of total
+        </small>
+      </div>
+    </div>
+
+    <div class="col-lg-3 col-md-6" data-aos="fade-up" data-aos-delay="200">
+      <div class="glass-card p-3 h-100">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div>
+            <p class="text-muted small mb-1">Breach Exposed</p>
+            <h3 class="mb-0 fw-bold">{{ stats.breached }}</h3>
+          </div>
+          <div class="text-danger" style="font-size:1.8rem;">
+            <i class="fas fa-radiation"></i>
+          </div>
+        </div>
+        <small class="{{ 'text-danger' if stats.breached > 0 else 'text-muted' }}">
+          {{ stats.breached_pct }}% of total
+        </small>
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Charts Row 1 ─────────────────────────────────────────────────────────── #}
+  <div class="row g-3 mb-4">
+
+    <div class="col-lg-8" data-aos="fade-up">
+      <div class="glass-card p-4">
+        <h5 class="mb-3 fw-semibold">Password Strength Over Time</h5>
+        <div class="chart-panel">
+          <canvas id="strengthTrendChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+      <div class="glass-card p-4">
+        <h5 class="mb-3 fw-semibold">Strength Distribution</h5>
+        <div class="chart-panel">
+          <canvas id="strengthDistChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Charts Row 2 ─────────────────────────────────────────────────────────── #}
+  <div class="row g-3 mb-4">
+
+    <div class="col-lg-6" data-aos="fade-up">
+      <div class="glass-card p-4">
+        <h5 class="mb-3 fw-semibold">Score Distribution by Bucket</h5>
+        <div class="chart-panel">
+          <canvas id="categoryChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-lg-6" data-aos="fade-up" data-aos-delay="100">
+      <div class="glass-card p-4">
+        <h5 class="mb-3 fw-semibold">Threat Category Breakdown</h5>
+        <div class="chart-panel">
+          <canvas id="vulnerabilityChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Summary Stats Row ────────────────────────────────────────────────────── #}
+  <div class="row g-3 mb-4">
+
+    {# Average Metrics (live) #}
+    <div class="col-lg-4" data-aos="fade-up">
+      <div class="glass-card p-4">
+        <h5 class="mb-3 fw-semibold">Average Metrics</h5>
+        {% if stats.total > 0 %}
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted">Avg Password Length</span>
+          <strong class="text-accent">{{ averages.avg_len }} chars</strong>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted">Avg Entropy</span>
+          <strong class="text-accent">{{ averages.avg_entropy }} bits</strong>
+        </div>
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <span class="text-muted">Avg Strength Score</span>
+          <strong class="text-accent">{{ averages.avg_score }}/100</strong>
+        </div>
+        <div class="d-flex justify-content-between align-items-center">
+          <span class="text-muted">Threat Level</span>
+          <strong class="
+            {% if stats.threat_level == 'Critical' %}text-danger
+            {% elif stats.threat_level == 'High' %}text-warning
+            {% elif stats.threat_level == 'Medium' %}text-info
+            {% else %}text-success{% endif %}">
+            {{ stats.threat_level }}
+          </strong>
+        </div>
+        {% else %}
+        <p class="text-muted small">No data yet. Analyse a password to see metrics.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Security Score Progress Bars (live) #}
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+      <div class="glass-card p-4">
+        <h5 class="mb-3 fw-semibold">Security Score Breakdown</h5>
+        {% if stats.total > 0 %}
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Strong / Excellent</span>
+            <span class="text-accent small">{{ stats.strong_pct }}%</span>
+          </div>
+          <div class="progress" style="height:6px;">
+            <div class="progress-bar"
+                 style="width:{{ stats.strong_pct }}%;background:var(--accent,#00e5ff);">
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Moderate</span>
+            <span class="text-warning small">
+              {# moderate = total - strong - weak - breached (not mutually exclusive, approx) #}
+              {% set moderate_pct = [0, 100 - stats.strong_pct - stats.weak_pct] | max %}
+              {{ moderate_pct | round(1) }}%
+            </span>
+          </div>
+          <div class="progress" style="height:6px;">
+            <div class="progress-bar bg-warning"
+                 style="width:{{ [0, 100 - stats.strong_pct - stats.weak_pct] | max | round(1) }}%;">
+            </div>
+          </div>
+        </div>
+
+        <div class="mb-3">
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Weak</span>
+            <span class="text-danger small">{{ stats.weak_pct }}%</span>
+          </div>
+          <div class="progress" style="height:6px;">
+            <div class="progress-bar bg-danger"
+                 style="width:{{ stats.weak_pct }}%;">
+            </div>
+          </div>
+        </div>
+
+        <div>
+          <div class="d-flex justify-content-between mb-1">
+            <span class="text-muted small">Breach-Free</span>
+            <span class="text-success small">
+              {{ (100 - stats.breached_pct) | round(1) }}%
+            </span>
+          </div>
+          <div class="progress" style="height:6px;">
+            <div class="progress-bar bg-success"
+                 style="width:{{ (100 - stats.breached_pct) | round(1) }}%;">
+            </div>
+          </div>
+        </div>
+
+        {% else %}
+        <p class="text-muted small">No data yet.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    {# Trend Summary (contextual) #}
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+      <div class="glass-card p-4">
+        <h5 class="mb-3 fw-semibold">Security Summary</h5>
+
+        <div class="d-flex align-items-start gap-2 pb-3 border-bottom border-secondary-subtle mb-3">
+          <i class="fas fa-database text-accent mt-1"></i>
+          <div>
+            <p class="text-muted small mb-0">Total analyses stored</p>
+            <strong>{{ stats.total }} password{{ 's' if stats.total != 1 else '' }}</strong>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-2 pb-3 border-bottom border-secondary-subtle mb-3">
+          <i class="fas fa-fire
+            {% if stats.threat_level == 'Critical' %}text-danger
+            {% elif stats.threat_level == 'High' %}text-warning
+            {% elif stats.threat_level == 'Medium' %}text-info
+            {% else %}text-success{% endif %} mt-1"></i>
+          <div>
+            <p class="text-muted small mb-0">Current threat level</p>
+            <strong>{{ stats.threat_level }}</strong>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-2 pb-3 border-bottom border-secondary-subtle mb-3">
+          <i class="fas fa-shield-check text-success mt-1"></i>
+          <div>
+            <p class="text-muted small mb-0">Strong passwords</p>
+            <strong>{{ stats.strong }} ({{ stats.strong_pct }}%)</strong>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-start gap-2">
+          <i class="fas fa-radiation
+            {% if stats.breached > 0 %}text-danger{% else %}text-muted{% endif %} mt-1"></i>
+          <div>
+            <p class="text-muted small mb-0">Breach exposures</p>
+            <strong class="{{ 'text-danger' if stats.breached > 0 else 'text-muted' }}">
+              {{ stats.breached }}
+              {% if stats.breached > 0 %}— immediate action required{% endif %}
+            </strong>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Monthly Performance Table (live) ─────────────────────────────────────── #}
+  <div class="glass-card p-4" data-aos="fade-up">
+    <h5 class="mb-3 fw-semibold">Monthly Performance</h5>
+    <div class="table-responsive">
+      <table class="table table-hover mb-0">
+        <thead>
+          <tr>
+            <th class="text-muted small">Month</th>
+            <th class="text-muted small text-center">Total Passwords</th>
+            <th class="text-muted small text-center">Strong %</th>
+            <th class="text-muted small text-center">Avg Score</th>
+            <th class="text-muted small text-center">Breached</th>
+            <th class="text-muted small text-center">Status</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% if monthly %}
+            {% for row in monthly %}
+            <tr>
+              <td class="text-muted fw-500">{{ row.month }}</td>
+              <td class="text-center text-muted">{{ row.total }}</td>
+              <td class="text-center text-muted">{{ row.strong_pct }}%</td>
+              <td class="text-center">
+                <span class="badge"
+                      style="background:rgba(0,229,255,0.15);color:{{ '#00e5ff' if row.avg_score >= 75 else ('#f59e0b' if row.avg_score >= 55 else '#ef4444') }};">
+                  {{ row.avg_score }}
+                </span>
+              </td>
+              <td class="text-center text-muted">{{ row.breached }}</td>
+              <td class="text-center">
+                <span class="badge"
+                      style="background:rgba(255,255,255,0.08);"
+                      class="{{ row.status_cls }}">
+                  <span class="{{ row.status_cls }}">{{ row.status }}</span>
+                </span>
+              </td>
+            </tr>
+            {% endfor %}
+          {% else %}
+          <tr>
+            <td colspan="6" class="text-center text-muted py-4">
+              <i class="fas fa-chart-bar me-2"></i>No monthly data yet.
+            </td>
+          </tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</div>{# /container-fluid #}
+
+{# Pass API URL to analytics JS #}
+<div id="analytics-data"
+     data-trend-url="{{ url_for('auth.api_daily_trend') }}"
+     data-dist-url="{{ url_for('auth.api_strength_pie') }}"
+     data-score-url="{{ url_for('auth.api_score_distribution') }}"
+     data-threat-url="{{ url_for('auth.api_threat_categories') }}"
+     style="display:none;"></div>
+
+<style>
+  .chart-panel { position:relative; height:280px; }
+  .fw-500 { font-weight:500; }
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+
+  const TOOLTIP = {
+    backgroundColor: 'rgba(15,23,42,0.92)',
+    titleColor: '#00e5ff',
+    bodyColor: '#f8fafc',
+    borderColor: 'rgba(0,229,255,0.25)',
+    borderWidth: 1,
+    padding: 12,
+  };
+
+  const el = document.getElementById('analytics-data');
+  if (!el) return;
+
+  const urls = {
+    trend: el.dataset.trendUrl,
+    dist:  el.dataset.distUrl,
+    score: el.dataset.scoreUrl,
+    threat: el.dataset.threatUrl,
+  };
+
+  function isEmpty(arr) { return !arr || arr.every(v => v === 0); }
+
+  function showEmpty(id) {
+    const c = document.getElementById(id);
+    if (!c) return;
+    const ctx = c.getContext('2d');
+    ctx.fillStyle = 'rgba(203,213,225,0.3)';
+    ctx.font = '12px Poppins,sans-serif';
+    ctx.textAlign = 'center';
+    ctx.textBaseline = 'middle';
+    ctx.fillText('No data yet — analyse a password first.', c.width / 2, c.height / 2);
+  }
+
+  // 1. Strength over time → strengthTrendChart
+  fetch(urls.trend, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(d => {
+      if (isEmpty(d.data)) { showEmpty('strengthTrendChart'); return; }
+      const canvas = document.getElementById('strengthTrendChart');
+      if (!canvas) return;
+      const ctx = canvas.getContext('2d');
+      const grad = ctx.createLinearGradient(0, 0, 0, 300);
+      grad.addColorStop(0, 'rgba(0,229,255,0.28)');
+      grad.addColorStop(1, 'rgba(0,229,255,0.02)');
+      new Chart(canvas, {
+        type: 'line',
+        data: {
+          labels: d.labels,
+          datasets: [{
+            label: 'Analyses',
+            data: d.data,
+            borderColor: '#00e5ff',
+            backgroundColor: grad,
+            borderWidth: 2.5,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3,
+            pointBackgroundColor: '#00e5ff',
+          }],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { ...TOOLTIP, displayColors: false } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { precision: 0 } },
+            x: { grid: { display: false }, ticks: { maxTicksLimit: 8, maxRotation: 0 } },
+          },
+        },
+      });
+    }).catch(() => showEmpty('strengthTrendChart'));
+
+  // 2. Strength distribution → strengthDistChart
+  fetch(urls.dist, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(d => {
+      if (isEmpty(d.data)) { showEmpty('strengthDistChart'); return; }
+      new Chart(document.getElementById('strengthDistChart'), {
+        type: 'doughnut',
+        data: {
+          labels: d.labels,
+          datasets: [{ data: d.data, backgroundColor: ['#ef4444','#f59e0b','#2ecc71','#00e5ff'], borderWidth: 0, hoverOffset: 10 }],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '60%',
+          plugins: {
+            legend: { position: 'bottom', labels: { padding: 12, usePointStyle: true, font: { size: 11 } } },
+            tooltip: { ...TOOLTIP },
+          },
+        },
+      });
+    }).catch(() => showEmpty('strengthDistChart'));
+
+  // 3. Score distribution buckets → categoryChart
+  fetch(urls.score, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(d => {
+      if (isEmpty(d.data)) { showEmpty('categoryChart'); return; }
+      new Chart(document.getElementById('categoryChart'), {
+        type: 'bar',
+        data: {
+          labels: d.labels,
+          datasets: [{
+            label: 'Passwords',
+            data: d.data,
+            backgroundColor: ['rgba(239,68,68,0.8)','rgba(245,158,11,0.8)','rgba(59,130,246,0.8)','rgba(124,77,255,0.8)','rgba(0,229,255,0.8)'],
+            borderRadius: 7,
+            borderSkipped: false,
+          }],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false,
+          plugins: { legend: { display: false }, tooltip: { ...TOOLTIP, callbacks: { label: c => `${c.parsed.y} passwords` } } },
+          scales: {
+            y: { beginAtZero: true, grid: { color: 'rgba(255,255,255,0.05)' }, ticks: { precision: 0 } },
+            x: { grid: { display: false } },
+          },
+        },
+      });
+    }).catch(() => showEmpty('categoryChart'));
+
+  // 4. Threat categories → vulnerabilityChart
+  fetch(urls.threat, { credentials: 'same-origin' })
+    .then(r => r.json())
+    .then(d => {
+      if (isEmpty(d.data)) { showEmpty('vulnerabilityChart'); return; }
+      new Chart(document.getElementById('vulnerabilityChart'), {
+        type: 'doughnut',
+        data: {
+          labels: d.labels,
+          datasets: [{ data: d.data, backgroundColor: ['#ef4444','#dc2626','#f59e0b','#eab308','#fb923c'], borderWidth: 0, hoverOffset: 10 }],
+        },
+        options: {
+          responsive: true, maintainAspectRatio: false, cutout: '65%',
+          plugins: {
+            legend: { position: 'right', labels: { padding: 10, usePointStyle: true, font: { size: 11 } } },
+            tooltip: { ...TOOLTIP },
+          },
+        },
+      });
+    }).catch(() => showEmpty('vulnerabilityChart'));
+});
+</script>
+{% endblock %}

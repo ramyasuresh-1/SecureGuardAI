@@ -1,0 +1,307 @@
+{% extends "base.html" %}
+
+{% block title %}History | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  {# ── Page Header ─────────────────────────────────────────────────────────── #}
+  <div class="page-header mb-4" data-aos="fade-down">
+    <div>
+      <p class="text-accent mb-1 fw-semibold">Activity Timeline</p>
+      <h2 class="fw-bold mb-0">Security History</h2>
+    </div>
+    {# Search form — GET so the URL is bookmarkable / shareable #}
+    <form method="GET" action="{{ url_for('auth.history') }}"
+          class="d-flex gap-2 align-items-center">
+      <div class="input-group search-box" style="width:280px;">
+        <span class="input-group-text bg-transparent border-end-0">
+          <i class="fas fa-search text-muted"></i>
+        </span>
+        <input class="form-control border-start-0"
+               name="search"
+               placeholder="Search by strength or label…"
+               value="{{ search }}" />
+      </div>
+      <button class="btn btn-accent" type="submit">Search</button>
+      {% if search %}
+      <a href="{{ url_for('auth.history') }}" class="btn btn-outline-light">
+        <i class="fas fa-times me-1"></i>Clear
+      </a>
+      {% endif %}
+    </form>
+  </div>
+
+  {# ── Summary strip ────────────────────────────────────────────────────────── #}
+  <div class="row g-3 mb-4" data-aos="fade-up">
+    <div class="col-sm-6 col-lg-3">
+      <div class="glass-card p-3 d-flex align-items-center gap-3">
+        <div class="card-icon bg-gradient-primary" style="width:44px;height:44px;flex-shrink:0;">
+          <i class="fas fa-list-check"></i>
+        </div>
+        <div>
+          <p class="text-muted small mb-0">Total Records</p>
+          <h4 class="mb-0 fw-bold">{{ paged.total }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="glass-card p-3 d-flex align-items-center gap-3">
+        <div class="card-icon bg-gradient-info" style="width:44px;height:44px;flex-shrink:0;">
+          <i class="fas fa-file-lines"></i>
+        </div>
+        <div>
+          <p class="text-muted small mb-0">This Page</p>
+          <h4 class="mb-0 fw-bold">{{ paged.rows | length }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="glass-card p-3 d-flex align-items-center gap-3">
+        <div class="card-icon bg-gradient-success" style="width:44px;height:44px;flex-shrink:0;">
+          <i class="fas fa-book-open"></i>
+        </div>
+        <div>
+          <p class="text-muted small mb-0">Page</p>
+          <h4 class="mb-0 fw-bold">{{ paged.page }} / {{ paged.pages }}</h4>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6 col-lg-3">
+      <div class="glass-card p-3 d-flex align-items-center gap-3">
+        <div class="card-icon bg-gradient-purple" style="width:44px;height:44px;flex-shrink:0;">
+          <i class="fas fa-magnifying-glass-chart"></i>
+        </div>
+        <div>
+          <p class="text-muted small mb-0">Filter</p>
+          <h4 class="mb-0 fw-bold text-truncate" style="max-width:120px;">
+            {{ '"' + search + '"' if search else 'All' }}
+          </h4>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ── Main table ───────────────────────────────────────────────────────────── #}
+  <div class="glass-card p-4" data-aos="fade-up">
+
+    {% if paged.rows %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0">
+        <thead>
+          <tr>
+            <th class="text-muted small">#</th>
+            <th class="text-muted small">Timestamp</th>
+            <th class="text-muted small">Label</th>
+            <th class="text-muted small text-center">Score</th>
+            <th class="text-muted small text-center">Strength</th>
+            <th class="text-muted small text-center">Length</th>
+            <th class="text-muted small text-center">Entropy</th>
+            <th class="text-muted small text-center">Breached</th>
+            <th class="text-muted small text-center">Patterns</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in paged.rows %}
+          {# Row colour hint #}
+          {% set tr_cls = '' %}
+          {% if row.is_breached %}
+            {% set tr_cls = 'table-row-danger' %}
+          {% elif row.strength_category == 'Weak' %}
+            {% set tr_cls = 'table-row-warning' %}
+          {% endif %}
+          <tr class="{{ tr_cls }}">
+
+            {# Sequence number across pages #}
+            <td class="text-muted small">
+              {{ (paged.page - 1) * paged.per_page + loop.index }}
+            </td>
+
+            <td class="text-muted small text-nowrap">{{ row.analyzed_at }}</td>
+
+            <td>
+              <span class="text-secondary">
+                {{ row.label if row.label and row.label != '—' else '—' }}
+              </span>
+            </td>
+
+            {# Score badge with colour scale #}
+            <td class="text-center">
+              <span class="badge score-badge
+                {% if row.strength_score >= 75 %}score-excellent
+                {% elif row.strength_score >= 55 %}score-good
+                {% elif row.strength_score >= 35 %}score-fair
+                {% else %}score-weak{% endif %}">
+                {{ row.strength_score }}
+              </span>
+            </td>
+
+            {# Strength category badge #}
+            <td class="text-center">
+              <span class="badge strength-badge
+                {% if row.strength_category == 'Excellent' %}bg-success
+                {% elif row.strength_category == 'Strong' %}bg-info text-dark
+                {% elif row.strength_category == 'Moderate' %}bg-warning text-dark
+                {% else %}bg-danger{% endif %}">
+                {{ row.strength_category }}
+              </span>
+            </td>
+
+            <td class="text-center text-muted small">{{ row.length }}</td>
+
+            <td class="text-center text-muted small">{{ row.entropy }}</td>
+
+            {# Breached indicator #}
+            <td class="text-center">
+              {% if row.is_breached %}
+              <i class="fas fa-radiation text-danger" title="Found in breach database"></i>
+              {% else %}
+              <i class="fas fa-check-circle text-success" title="Not in breach database"></i>
+              {% endif %}
+            </td>
+
+            {# Detected pattern flags #}
+            <td class="text-center">
+              <div class="d-flex gap-1 justify-content-center flex-wrap">
+                {% if row.dictionary_word %}
+                <span class="badge bg-secondary" title="Dictionary word">Dict</span>
+                {% endif %}
+                {% if row.keyboard_pattern %}
+                <span class="badge bg-secondary" title="Keyboard pattern">KBD</span>
+                {% endif %}
+                {% if not row.dictionary_word and not row.keyboard_pattern %}
+                <span class="text-muted small">—</span>
+                {% endif %}
+              </div>
+            </td>
+
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# ── Pagination ───────────────────────────────────────────────────────── #}
+    <nav class="mt-4" aria-label="History pagination">
+      <ul class="pagination justify-content-end mb-0 flex-wrap gap-1">
+
+        {# Previous #}
+        <li class="page-item {{ 'disabled' if not paged.has_prev }}">
+          <a class="page-link"
+             href="{{ url_for('auth.history', page=paged.page-1, search=search) if paged.has_prev else '#' }}"
+             aria-label="Previous">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+
+        {# Page numbers — show at most 7 around current page #}
+        {% set win = 3 %}
+        {% set p_start = [1, paged.page - win] | max %}
+        {% set p_end   = [paged.pages, paged.page + win] | min %}
+
+        {% if p_start > 1 %}
+        <li class="page-item">
+          <a class="page-link"
+             href="{{ url_for('auth.history', page=1, search=search) }}">1</a>
+        </li>
+        {% if p_start > 2 %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+        {% endif %}
+
+        {% for p in range(p_start, p_end + 1) %}
+        <li class="page-item {{ 'active' if p == paged.page }}">
+          <a class="page-link"
+             href="{{ url_for('auth.history', page=p, search=search) }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+
+        {% if p_end < paged.pages %}
+        {% if p_end < paged.pages - 1 %}
+        <li class="page-item disabled"><span class="page-link">…</span></li>
+        {% endif %}
+        <li class="page-item">
+          <a class="page-link"
+             href="{{ url_for('auth.history', page=paged.pages, search=search) }}">
+            {{ paged.pages }}
+          </a>
+        </li>
+        {% endif %}
+
+        {# Next #}
+        <li class="page-item {{ 'disabled' if not paged.has_next }}">
+          <a class="page-link"
+             href="{{ url_for('auth.history', page=paged.page+1, search=search) if paged.has_next else '#' }}"
+             aria-label="Next">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+
+      </ul>
+    </nav>
+
+    {% else %}
+    {# Empty state #}
+    <div class="text-center py-5">
+      <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+      {% if search %}
+      <h5 class="text-muted">No results for "{{ search }}"</h5>
+      <p class="text-muted small mb-3">Try a different search term or clear the filter.</p>
+      <a href="{{ url_for('auth.history') }}" class="btn btn-outline-light me-2">
+        <i class="fas fa-times me-1"></i>Clear Search
+      </a>
+      {% else %}
+      <h5 class="text-muted">No password analyses yet</h5>
+      <p class="text-muted small mb-3">
+        Analyse your first password to start building your security history.
+      </p>
+      {% endif %}
+      <a href="{{ url_for('auth.analyzer') }}" class="btn btn-accent">
+        <i class="fas fa-shield-halved me-2"></i>Analyse a Password
+      </a>
+    </div>
+    {% endif %}
+
+  </div>{# /glass-card #}
+</div>{# /container-fluid #}
+
+<style>
+  /* Row colour hints */
+  .table-row-danger td { border-left: 3px solid var(--bs-danger); }
+  .table-row-warning td { border-left: 3px solid var(--bs-warning); }
+
+  /* Score badges */
+  .score-badge {
+    font-size: 0.8rem;
+    padding: 0.3em 0.6em;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+  .score-excellent { background: rgba(0,229,255,0.18);  color: #00e5ff; }
+  .score-good      { background: rgba(46,204,113,0.18); color: #2ecc71; }
+  .score-fair      { background: rgba(245,158,11,0.18); color: #f59e0b; }
+  .score-weak      { background: rgba(239,68,68,0.18);  color: #ef4444; }
+
+  /* Strength badges */
+  .strength-badge { font-size: 0.75rem; }
+
+  /* Pagination tweaks */
+  .page-link {
+    background: rgba(255,255,255,0.05);
+    border-color: rgba(255,255,255,0.1);
+    color: var(--text, #f8fafc);
+    border-radius: 8px !important;
+    transition: all .2s ease;
+  }
+  .page-link:hover,
+  .page-item.active .page-link {
+    background: var(--accent, #00e5ff);
+    border-color: var(--accent, #00e5ff);
+    color: #0f172a;
+  }
+  .page-item.disabled .page-link {
+    opacity: .4;
+    pointer-events: none;
+  }
+</style>
+{% endblock %}

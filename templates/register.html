@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+
+{% block title %}Register | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="auth-page py-5">
+  <div class="container py-5">
+    <div class="row justify-content-center">
+      <div class="col-xl-8">
+        <div class="glass-card registration-card p-4 p-md-5">
+          <div class="row g-4 align-items-center">
+            <div class="col-lg-5">
+              <div class="registration-side-panel p-4 rounded-4">
+                <div class="mb-4">
+                  <i class="fa-solid fa-shield-halved fa-2x text-accent"></i>
+                </div>
+                <h2 class="fw-bold mb-3">Create your SecureGuard AI account</h2>
+                <p class="text-muted">Join the platform with a professional, secure, and streamlined onboarding experience.</p>
+                <ul class="list-unstyled small text-muted mt-4">
+                  <li><i class="fa-solid fa-circle-check text-accent me-2"></i>Validated email and password rules</li>
+                  <li><i class="fa-solid fa-circle-check text-accent me-2"></i>Default avatar selection</li>
+                  <li><i class="fa-solid fa-circle-check text-accent me-2"></i>Secure password storage with hashing</li>
+                </ul>
+              </div>
+            </div>
+            <div class="col-lg-7">
+              <h3 class="fw-bold mb-3">Register</h3>
+              <p class="text-muted">Start with a strong foundation and a polished account profile.</p>
+              <form method="post" class="needs-validation" novalidate>
+                {{ form.hidden_tag() }}
+                <div class="mb-3">
+                  {{ form.full_name.label(class="form-label") }}
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-user"></i></span>
+                    {{ form.full_name(class="form-control", placeholder="Enter your full name") }}
+                  </div>
+                </div>
+                <div class="mb-3">
+                  {{ form.email.label(class="form-label") }}
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-envelope"></i></span>
+                    {{ form.email(class="form-control", placeholder="name@example.com") }}
+                  </div>
+                </div>
+                <div class="mb-3">
+                  {{ form.password.label(class="form-label") }}
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                    {{ form.password(class="form-control", id="password", placeholder="At least 8 characters") }}
+                    <button class="btn btn-outline-light password-toggle" type="button" data-target="password"><i class="fa-solid fa-eye"></i></button>
+                  </div>
+                  <div class="password-strength mt-2">
+                    <div class="password-strength-bar" id="password-strength-bar"></div>
+                  </div>
+                  <small class="text-muted" id="password-strength-text">Password strength: weak</small>
+                </div>
+                <div class="mb-3">
+                  {{ form.confirm_password.label(class="form-label") }}
+                  <div class="input-group">
+                    <span class="input-group-text"><i class="fa-solid fa-lock"></i></span>
+                    {{ form.confirm_password(class="form-control", id="confirm_password", placeholder="Confirm password") }}
+                    <button class="btn btn-outline-light password-toggle" type="button" data-target="confirm_password"><i class="fa-solid fa-eye"></i></button>
+                  </div>
+                </div>
+                <div class="mb-4">
+                  {{ form.avatar.label(class="form-label") }}
+                  <div class="avatar-grid">
+                    {% for value, label in form.avatar.choices %}
+                    <label class="avatar-option{% if form.avatar.data == value %} selected{% endif %}">
+                      <input type="radio" name="avatar" value="{{ value }}" {% if form.avatar.data == value %}checked{% endif %} />
+                      <img src="{{ url_for('static', filename=value) }}" alt="{{ label }}" />
+                      <span>{{ label }}</span>
+                    </label>
+                    {% endfor %}
+                  </div>
+                </div>
+                {{ form.submit(class="btn btn-accent w-100") }}
+              </form>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
