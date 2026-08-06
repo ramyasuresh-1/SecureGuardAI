@@ -1,0 +1,407 @@
+{% extends "base.html" %}
+{% block title %}AI Security Coach | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+{# ══ SECTION 1 — Hero Banner ════════════════════════════════════════════ #}
+<div class="coach-hero glass-card p-4 mb-4" data-aos="fade-down">
+  <div class="row align-items-center g-3">
+    <div class="col-lg-7">
+      <div class="d-flex align-items-center gap-3 mb-2">
+        <div class="coach-hero-icon">
+          <i class="fas fa-robot"></i>
+        </div>
+        <div>
+          <h2 class="fw-bold mb-0">AI Security Coach</h2>
+          <p class="text-muted mb-0">
+            Your personal cybersecurity mentor — analysing your habits,
+            identifying weaknesses, and guiding you to stronger security.
+          </p>
+        </div>
+      </div>
+    </div>
+    <div class="col-lg-5">
+      <div class="row g-3 text-center">
+        <div class="col-4">
+          <div class="coach-hero-stat glass-card p-3">
+            <div class="coach-hero-stat-value {{ health.colour }}">{{ health.grade }}</div>
+            <div class="coach-hero-stat-label">Security Grade</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="coach-hero-stat glass-card p-3">
+            <div class="coach-hero-stat-value">{{ health.total_analyses }}</div>
+            <div class="coach-hero-stat-label">Analyses</div>
+          </div>
+        </div>
+        <div class="col-4">
+          <div class="coach-hero-stat glass-card p-3">
+            <div class="coach-hero-stat-value {{ health.colour }}">{{ health.score }}</div>
+            <div class="coach-hero-stat-label">Health Score</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ══ SECTION 2 — Security Health Score ══════════════════════════════════ #}
+<div class="row g-4 mb-4">
+  <div class="col-lg-5" data-aos="fade-up">
+    <div class="glass-card p-4 h-100">
+      <h5 class="fw-semibold mb-3">
+        <i class="fas fa-heart-pulse text-accent me-2"></i>Security Health Score
+      </h5>
+
+      <div class="text-center mb-3">
+        <div class="coach-score-circle mx-auto">
+          <span class="coach-score-value {{ health.colour }}">{{ health.score }}</span>
+          <small class="text-muted d-block">/100</small>
+        </div>
+        <span class="badge fs-6 px-3 py-2 mt-2 {{ health.bar_class }}">
+          Grade {{ health.grade }}
+        </span>
+      </div>
+
+      <p class="text-muted small text-center mb-3">{{ health.summary }}</p>
+
+      {% for f in health.factors %}
+      <div class="mb-2">
+        <div class="d-flex justify-content-between mb-1">
+          <span class="text-muted small">{{ f.label }}</span>
+          <span class="small fw-semibold">{{ f.value }}</span>
+        </div>
+        <div class="progress" style="height:5px;">
+          <div class="progress-bar {{ f.colour }}" style="width:{{ f.pct }}%"></div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ── Personalised AI Recommendations ──────────────────────────────── #}
+  <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
+    <div class="glass-card p-4 h-100">
+      <h5 class="fw-semibold mb-3">
+        <i class="fas fa-lightbulb text-accent me-2"></i>AI Recommendations
+      </h5>
+      <div class="row g-3">
+        {% for rec in recs %}
+        <div class="col-md-6">
+          <div class="ai-insight-card h-100">
+            <div class="ai-insight-icon">
+              <i class="{{ rec.icon }}"></i>
+            </div>
+            <div class="ai-insight-content">
+              <h6 class="mb-1">{{ rec.title }}</h6>
+              <p class="text-muted small mb-2">{{ rec.body }}</p>
+              <span class="badge {{ rec.badge }}">{{ rec.badge_text }}</span>
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ══ SECTION 3 — Common Weakness Analysis ═══════════════════════════════ #}
+<div class="glass-card p-4 mb-4" data-aos="fade-up">
+  <h5 class="fw-semibold mb-3">
+    <i class="fas fa-bug text-accent me-2"></i>Common Weakness Analysis
+  </h5>
+  {% if weaknesses %}
+  <div class="row g-3">
+    {% for w in weaknesses %}
+    <div class="col-md-6 col-lg-4">
+      <div class="coach-weakness-card">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <i class="{{ w.icon }} text-{{ w.severity }}"></i>
+          <span class="fw-semibold small">{{ w.label }}</span>
+          <span class="badge {{ w.bar_colour }} ms-auto" style="font-size:0.7rem;">
+            {{ w.count }}
+          </span>
+        </div>
+        <div class="progress mb-2" style="height:4px;">
+          <div class="progress-bar {{ w.bar_colour }}" style="width:{{ w.pct }}%"></div>
+        </div>
+        <p class="text-muted" style="font-size:0.78rem;margin:0;">
+          <i class="fas fa-wrench me-1"></i>{{ w.tip }}
+        </p>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="text-center py-4">
+    <i class="fas fa-shield-check fa-2x text-success mb-2"></i>
+    <p class="text-muted small mb-0">
+      No weaknesses detected yet. Analyse passwords to receive coaching.
+    </p>
+  </div>
+  {% endif %}
+</div>
+
+{# ══ SECTION 4 + 5 — Timeline + Improvement Suggestions ════════════════ #}
+<div class="row g-4 mb-4">
+
+  {# Improvement Timeline #}
+  <div class="col-lg-5" data-aos="fade-up">
+    <div class="glass-card p-4 h-100">
+      <h5 class="fw-semibold mb-3">
+        <i class="fas fa-timeline text-accent me-2"></i>Improvement Timeline
+      </h5>
+      {% if timeline %}
+      <div class="breach-timeline">
+        {% for item in timeline %}
+        <div class="breach-timeline-item">
+          <div class="breach-timeline-connector"></div>
+          <div class="breach-timeline-icon {{ item.trend_class }}">
+            <i class="{{ item.trend_icon }}"></i>
+          </div>
+          <div class="breach-timeline-body">
+            <div class="d-flex justify-content-between align-items-start flex-wrap gap-1">
+              <strong class="small">{{ item.label }}</strong>
+              <span class="text-muted" style="font-size:0.72rem;">{{ item.time_ago }}</span>
+            </div>
+            <div class="text-muted" style="font-size:0.78rem;">
+              Score: {{ item.score }}/100 · {{ item.category }}
+              {% if item.is_breached %}
+              <span class="badge bg-danger ms-1" style="font-size:0.65rem;">Breached</span>
+              {% endif %}
+            </div>
+            <div class="text-muted" style="font-size:0.72rem;">{{ item.trend_text }}</div>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="text-center py-4">
+        <i class="fas fa-clock fa-2x text-muted mb-2"></i>
+        <p class="text-muted small mb-0">No history yet.</p>
+        <a href="{{ url_for('auth.analyzer') }}" class="btn btn-accent btn-sm mt-2">
+          Analyse a Password
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </div>
+
+  {# Improvement Suggestions #}
+  <div class="col-lg-7" data-aos="fade-up" data-aos-delay="100">
+    <div class="glass-card p-4 h-100">
+      <h5 class="fw-semibold mb-3">
+        <i class="fas fa-wand-magic-sparkles text-accent me-2"></i>Password Improvement Suggestions
+      </h5>
+      <div class="row g-3">
+        {% for s in suggestions %}
+        <div class="col-md-6">
+          <div class="coach-suggestion-card">
+            <div class="d-flex align-items-center gap-2 mb-2">
+              <div class="coach-suggestion-icon">
+                <i class="{{ s.icon }}"></i>
+              </div>
+              <strong class="small">{{ s.title }}</strong>
+            </div>
+            <p class="text-muted small mb-2">{{ s.body }}</p>
+            {% if s.example %}
+            <code class="breach-label-code" style="font-size:0.78rem;">{{ s.example }}</code>
+            {% endif %}
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+    </div>
+  </div>
+</div>
+
+{# ══ SECTION 6 — Attack Simulation Insights ═════════════════════════════ #}
+<div class="glass-card p-4 mb-4" data-aos="fade-up">
+  <h5 class="fw-semibold mb-3">
+    <i class="fas fa-crosshairs text-accent me-2"></i>Attack Simulation Insights
+  </h5>
+  <div class="row g-3">
+    {% for atk in attacks %}
+    <div class="col-md-6 col-lg-4">
+      <div class="coach-attack-card">
+        <div class="d-flex align-items-center gap-2 mb-2">
+          <div class="coach-attack-icon">
+            <i class="{{ atk.icon }}"></i>
+          </div>
+          <div>
+            <div class="fw-semibold small">{{ atk.title }}</div>
+            <span class="small {{ atk.status_col }}">
+              <i class="fas fa-circle me-1" style="font-size:0.5rem;"></i>{{ atk.status_text }}
+            </span>
+          </div>
+        </div>
+        <p class="text-muted mb-2" style="font-size:0.8rem;">{{ atk.description }}</p>
+        <div class="coach-mitigation">
+          <i class="fas fa-shield-alt text-accent me-1"></i>
+          <span style="font-size:0.75rem;">{{ atk.mitigation }}</span>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{# ══ SECTION 7 — Learning Center ════════════════════════════════════════ #}
+<div class="glass-card p-4 mb-4" data-aos="fade-up">
+  <h5 class="fw-semibold mb-3">
+    <i class="fas fa-graduation-cap text-accent me-2"></i>Cybersecurity Learning Center
+  </h5>
+  <div class="row g-3">
+    {% for module in learning %}
+    <div class="col-md-6 col-lg-4">
+      <div class="coach-learn-card">
+        <div class="d-flex align-items-start gap-3">
+          <div class="coach-learn-icon">
+            <i class="{{ module.icon }}"></i>
+          </div>
+          <div class="flex-grow-1">
+            <div class="d-flex justify-content-between align-items-start mb-1">
+              <strong class="small">{{ module.title }}</strong>
+              <span class="badge {{ module.level_cls }} ms-2"
+                    style="font-size:0.65rem;flex-shrink:0;">
+                {{ module.level }}
+              </span>
+            </div>
+            <p class="text-muted mb-2" style="font-size:0.8rem;">{{ module.body }}</p>
+            <span class="text-muted" style="font-size:0.72rem;">
+              <i class="fas fa-clock me-1"></i>{{ module.read_time }} read
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{# ══ SECTION 8 — AI Q&A ══════════════════════════════════════════════════ #}
+<div class="glass-card p-4 mb-4" data-aos="fade-up">
+  <h5 class="fw-semibold mb-3">
+    <i class="fas fa-comments text-accent me-2"></i>AI Security Q&amp;A
+  </h5>
+  <div class="accordion accordion-flush" id="qnaAccordion">
+    {% for item in qna %}
+    <div class="accordion-item coach-qna-item">
+      <h2 class="accordion-header" id="qna-head-{{ loop.index }}">
+        <button class="accordion-button collapsed coach-qna-btn"
+                type="button"
+                data-bs-toggle="collapse"
+                data-bs-target="#qna-body-{{ loop.index }}"
+                aria-expanded="false">
+          <i class="fas fa-question-circle text-accent me-2"></i>
+          {{ item.q }}
+        </button>
+      </h2>
+      <div id="qna-body-{{ loop.index }}"
+           class="accordion-collapse collapse"
+           data-bs-parent="#qnaAccordion">
+        <div class="accordion-body coach-qna-body">
+          <i class="fas fa-robot text-accent me-2"></i>{{ item.a }}
+        </div>
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{# ══ SECTION 9 — Security Achievements ══════════════════════════════════ #}
+<div class="glass-card p-4 mb-4" data-aos="fade-up">
+  <h5 class="fw-semibold mb-3">
+    <i class="fas fa-trophy text-accent me-2"></i>Security Achievements
+  </h5>
+  <div class="row g-3">
+    {% for ach in achievements %}
+    <div class="col-6 col-md-4 col-lg-3">
+      <div class="coach-achievement-card {{ '' if ach.unlocked else 'coach-achievement-locked' }}">
+        <div class="coach-achievement-icon"
+             style="color: {{ ach.colour if ach.unlocked else '#475569' }};">
+          <i class="{{ ach.icon }}"></i>
+        </div>
+        <div class="fw-semibold small mb-1">{{ ach.title }}</div>
+        <p class="text-muted mb-2" style="font-size:0.72rem;">{{ ach.description }}</p>
+        {% if ach.unlocked %}
+        <span class="badge bg-success" style="font-size:0.68rem;">
+          <i class="fas fa-check me-1"></i>Unlocked
+        </span>
+        {% else %}
+        <div class="progress mb-1" style="height:4px;">
+          <div class="progress-bar bg-secondary" style="width:{{ ach.progress_pct }}%"></div>
+        </div>
+        <span class="text-muted" style="font-size:0.68rem;">{{ ach.progress_pct }}% complete</span>
+        {% endif %}
+      </div>
+    </div>
+    {% endfor %}
+  </div>
+</div>
+
+{# ══ SECTION 10 — Quick Actions ══════════════════════════════════════════ #}
+<div class="glass-card p-4 mb-4" data-aos="fade-up">
+  <h5 class="fw-semibold mb-3">
+    <i class="fas fa-bolt text-accent me-2"></i>Quick Actions
+  </h5>
+  <div class="row g-3">
+    <div class="col-6 col-lg-3">
+      <a href="{{ url_for('auth.analyzer') }}" class="quick-action-btn d-block">
+        <div class="d-flex align-items-center gap-3">
+          <div class="quick-action-icon bg-gradient-primary">
+            <i class="fas fa-microscope"></i>
+          </div>
+          <div>
+            <div class="action-title">Analyse Password</div>
+            <small class="text-muted">Run a new check</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-lg-3">
+      <a href="{{ url_for('auth.breach_detection') }}" class="quick-action-btn d-block">
+        <div class="d-flex align-items-center gap-3">
+          <div class="quick-action-icon bg-gradient-danger">
+            <i class="fas fa-radiation"></i>
+          </div>
+          <div>
+            <div class="action-title">Breach Center</div>
+            <small class="text-muted">Check exposure</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-lg-3">
+      <a href="{{ url_for('auth.history') }}" class="quick-action-btn d-block">
+        <div class="d-flex align-items-center gap-3">
+          <div class="quick-action-icon bg-gradient-info">
+            <i class="fas fa-history"></i>
+          </div>
+          <div>
+            <div class="action-title">View History</div>
+            <small class="text-muted">Past analyses</small>
+          </div>
+        </div>
+      </a>
+    </div>
+    <div class="col-6 col-lg-3">
+      <a href="{{ url_for('auth.analytics') }}" class="quick-action-btn d-block">
+        <div class="d-flex align-items-center gap-3">
+          <div class="quick-action-icon bg-gradient-success">
+            <i class="fas fa-chart-bar"></i>
+          </div>
+          <div>
+            <div class="action-title">Analytics</div>
+            <small class="text-muted">Trends &amp; stats</small>
+          </div>
+        </div>
+      </a>
+    </div>
+  </div>
+</div>
+
+</div>{# /container-fluid #}
+<script src="{{ url_for('static', filename='js/coach.js') }}"></script>
+{% endblock %}

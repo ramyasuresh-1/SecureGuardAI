@@ -94,11 +94,12 @@
             <th class="text-muted small">Timestamp</th>
             <th class="text-muted small">Label</th>
             <th class="text-muted small text-center">Score</th>
-            <th class="text-muted small text-center">Strength</th>
-            <th class="text-muted small text-center">Length</th>
-            <th class="text-muted small text-center">Entropy</th>
+            <th class="text-muted small text-center">Rule Result</th>
+            <th class="text-muted small text-center">ML Prediction</th>
+            <th class="text-muted small text-center">Confidence</th>
+            <th class="text-muted small text-center">Final Decision</th>
+            <th class="text-muted small text-center">Source</th>
             <th class="text-muted small text-center">Breached</th>
-            <th class="text-muted small text-center">Patterns</th>
           </tr>
         </thead>
         <tbody>
@@ -107,12 +108,11 @@
           {% set tr_cls = '' %}
           {% if row.is_breached %}
             {% set tr_cls = 'table-row-danger' %}
-          {% elif row.strength_category == 'Weak' %}
+          {% elif row.strength_category == 'Weak' or row.strength_category == 'Very Weak' %}
             {% set tr_cls = 'table-row-warning' %}
           {% endif %}
           <tr class="{{ tr_cls }}">
 
-            {# Sequence number across pages #}
             <td class="text-muted small">
               {{ (paged.page - 1) * paged.per_page + loop.index }}
             </td>
@@ -125,7 +125,7 @@
               </span>
             </td>
 
-            {# Score badge with colour scale #}
+            {# Score badge #}
             <td class="text-center">
               <span class="badge score-badge
                 {% if row.strength_score >= 75 %}score-excellent
@@ -136,20 +136,82 @@
               </span>
             </td>
 
-            {# Strength category badge #}
+            {# Rule Result (strength_category from rule engine) #}
             <td class="text-center">
               <span class="badge strength-badge
-                {% if row.strength_category == 'Excellent' %}bg-success
-                {% elif row.strength_category == 'Strong' %}bg-info text-dark
-                {% elif row.strength_category == 'Moderate' %}bg-warning text-dark
+                {% if row.strength_category in ('Excellent','Strong') %}bg-success
+                {% elif row.strength_category == 'Moderate' %}bg-info text-dark
                 {% else %}bg-danger{% endif %}">
                 {{ row.strength_category }}
               </span>
             </td>
 
-            <td class="text-center text-muted small">{{ row.length }}</td>
+            {# ML Prediction #}
+            <td class="text-center">
+              {% if row.ml_prediction %}
+              <span class="badge
+                {% if row.ml_prediction in ('Excellent','Strong') %}badge-hybrid-strong
+                {% elif row.ml_prediction == 'Moderate' %}badge-hybrid-moderate
+                {% else %}badge-hybrid-weak{% endif %}">
+                {{ row.ml_prediction }}
+              </span>
+              {% else %}
+              <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
 
-            <td class="text-center text-muted small">{{ row.entropy }}</td>
+            {# ML Confidence #}
+            <td class="text-center">
+              {% if row.ml_confidence is not none %}
+              <span class="small fw-semibold
+                {% if row.ml_confidence >= 0.90 %}text-success
+                {% elif row.ml_confidence >= 0.70 %}text-info
+                {% else %}text-warning{% endif %}">
+                {{ "%.0f"|format(row.ml_confidence * 100) }}%
+              </span>
+              {% else %}
+              <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
+
+            {# Final Hybrid Decision #}
+            <td class="text-center">
+              {% if row.hybrid_decision %}
+              <span class="badge
+                {% if row.hybrid_decision in ('Excellent','Strong') %}badge-hybrid-strong
+                {% elif row.hybrid_decision == 'Moderate' %}badge-hybrid-moderate
+                {% else %}badge-hybrid-weak{% endif %}">
+                {{ row.hybrid_decision }}
+              </span>
+              {% if row.hybrid_agreement is not none %}
+                {% if row.hybrid_agreement %}
+                <i class="fas fa-check-circle text-success ms-1"
+                   title="Rule &amp; ML agreed" style="font-size:0.7rem;"></i>
+                {% else %}
+                <i class="fas fa-exchange-alt text-warning ms-1"
+                   title="Engines disagreed" style="font-size:0.7rem;"></i>
+                {% endif %}
+              {% endif %}
+              {% else %}
+              <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
+
+            {# Decision Source #}
+            <td class="text-center">
+              {% if row.decision_source %}
+              <span class="badge badge-source-pill
+                {% if row.decision_source == 'Hybrid Consensus' %}badge-src-consensus
+                {% elif row.decision_source == 'Machine Learning' %}badge-src-ml
+                {% elif row.decision_source == 'Weighted Decision' %}badge-src-weighted
+                {% elif row.decision_source == 'Breach Guard' %}badge-src-breach
+                {% else %}badge-src-rule{% endif %}">
+                {{ row.decision_source }}
+              </span>
+              {% else %}
+              <span class="text-muted small">—</span>
+              {% endif %}
+            </td>
 
             {# Breached indicator #}
             <td class="text-center">
@@ -158,21 +220,6 @@
               {% else %}
               <i class="fas fa-check-circle text-success" title="Not in breach database"></i>
               {% endif %}
-            </td>
-
-            {# Detected pattern flags #}
-            <td class="text-center">
-              <div class="d-flex gap-1 justify-content-center flex-wrap">
-                {% if row.dictionary_word %}
-                <span class="badge bg-secondary" title="Dictionary word">Dict</span>
-                {% endif %}
-                {% if row.keyboard_pattern %}
-                <span class="badge bg-secondary" title="Keyboard pattern">KBD</span>
-                {% endif %}
-                {% if not row.dictionary_word and not row.keyboard_pattern %}
-                <span class="text-muted small">—</span>
-                {% endif %}
-              </div>
             </td>
 
           </tr>
@@ -284,6 +331,19 @@
 
   /* Strength badges */
   .strength-badge { font-size: 0.75rem; }
+
+  /* Hybrid AI decision badge variants */
+  .badge-hybrid-strong   { background:rgba(46,204,113,0.2);  color:#2ecc71;  font-size:0.72rem; }
+  .badge-hybrid-moderate { background:rgba(59,130,246,0.2);  color:#3b82f6;  font-size:0.72rem; }
+  .badge-hybrid-weak     { background:rgba(239,68,68,0.2);   color:#ef4444;  font-size:0.72rem; }
+
+  /* Decision source pill badges */
+  .badge-source-pill  { font-size:0.65rem; border-radius:999px; padding:.25em .65em; font-weight:600; }
+  .badge-src-consensus { background:rgba(46,204,113,0.18);  color:#2ecc71; }
+  .badge-src-ml        { background:rgba(124,77,255,0.2);   color:#a78bfa; }
+  .badge-src-weighted  { background:rgba(59,130,246,0.2);   color:#60a5fa; }
+  .badge-src-breach    { background:rgba(239,68,68,0.2);    color:#fca5a5; }
+  .badge-src-rule      { background:rgba(245,158,11,0.18);  color:#fcd34d; }
 
   /* Pagination tweaks */
   .page-link {

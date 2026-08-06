@@ -4,28 +4,254 @@
 
 {% block content %}
 <div class="container-fluid px-4 py-4" data-aos="fade-up">
-  <div class="page-header">
+  <div class="page-header mb-4">
     <div>
       <p class="text-accent mb-1 fw-semibold">Reports</p>
-      <h2 class="fw-bold mb-0">Downloadable Executive Summaries</h2>
+      <h2 class="fw-bold mb-0">Downloadable Security Reports</h2>
     </div>
   </div>
 
-  <div class="row g-4">
-    <div class="col-lg-6">
-      <div class="glass-card p-4">
-        <h5 class="fw-semibold mb-3">Quarterly Security Review</h5>
-        <p class="text-muted">Detailed trend summary with posture changes and action items.</p>
-        <button class="btn btn-accent"><i class="fa-solid fa-download me-2"></i>Download PDF</button>
+  {# ── Download Cards ───────────────────────────────────────────────── #}
+  <div class="row g-4 mb-4">
+
+    {# PDF #}
+    <div class="col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="quick-action-icon bg-gradient-danger">
+            <i class="fas fa-file-pdf"></i>
+          </div>
+          <div>
+            <h5 class="fw-semibold mb-0">Full Security Report</h5>
+            <p class="text-muted small mb-0">
+              7-page enterprise PDF — cover, executive summary,
+              password analysis, Hybrid AI, breach intelligence,
+              charts, recommendations, and best practices checklist.
+            </p>
+          </div>
+        </div>
+        <div class="mt-auto pt-2">
+          <a href="{{ url_for('auth.download_pdf_report') }}"
+             class="btn btn-accent w-100">
+            <i class="fas fa-download me-2"></i>Download PDF
+          </a>
+        </div>
       </div>
     </div>
-    <div class="col-lg-6">
+
+    {# CSV #}
+    <div class="col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="quick-action-icon bg-gradient-success">
+            <i class="fas fa-file-csv"></i>
+          </div>
+          <div>
+            <h5 class="fw-semibold mb-0">Raw Data Export</h5>
+            <p class="text-muted small mb-0">
+              Complete CSV with all password analyses — strength scores,
+              entropy, Hybrid AI fields, breach status, and more.
+            </p>
+          </div>
+        </div>
+        <div class="mt-auto pt-2">
+          <a href="{{ url_for('auth.download_csv_report') }}"
+             class="btn btn-accent w-100">
+            <i class="fas fa-download me-2"></i>Download CSV
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {# Excel #}
+    <div class="col-lg-4">
+      <div class="glass-card p-4 h-100 d-flex flex-column">
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="quick-action-icon bg-gradient-info">
+            <i class="fas fa-file-excel"></i>
+          </div>
+          <div>
+            <h5 class="fw-semibold mb-0">Excel Workbook</h5>
+            <p class="text-muted small mb-0">
+              6-sheet .xlsx — executive summary, password analysis,
+              Hybrid AI, breach intelligence, analytics, and
+              recommendations with professional formatting.
+            </p>
+          </div>
+        </div>
+        <div class="mt-auto pt-2">
+          <a href="{{ url_for('auth.download_excel_report') }}"
+             class="btn btn-accent w-100">
+            <i class="fas fa-download me-2"></i>Download Excel
+          </a>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  {# ── Hybrid AI Report Preview ──────────────────────────────────────── #}
+  <div class="glass-card p-4 mb-4" id="hybridReportSection" style="display:none;">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+      <h5 class="fw-semibold mb-0">
+        <i class="fas fa-robot text-accent me-2"></i>Hybrid AI Report Preview
+      </h5>
+      <span class="badge-soft">Live from SQLite</span>
+    </div>
+    <div id="hybridReportTable" class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="reportTable">
+        <thead>
+          <tr>
+            <th class="text-muted small">Label</th>
+            <th class="text-muted small text-center">Rule Result</th>
+            <th class="text-muted small text-center">ML Prediction</th>
+            <th class="text-muted small text-center">Confidence</th>
+            <th class="text-muted small text-center">Final Decision</th>
+            <th class="text-muted small text-center">Agreement</th>
+            <th class="text-muted small">Decision Source</th>
+            <th class="text-muted small">AI Reason</th>
+          </tr>
+        </thead>
+        <tbody id="reportTableBody">
+          <tr>
+            <td colspan="8" class="text-center text-muted py-4">
+              <span class="spinner-border spinner-border-sm me-2"></span>
+              Loading Hybrid AI data…
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="mt-3 d-flex gap-2">
+      <button class="btn btn-accent btn-sm" id="downloadHybridCsvBtn">
+        <i class="fas fa-download me-2"></i>Download Hybrid AI CSV
+      </button>
+      <button class="btn btn-outline-light btn-sm" id="closeReportPreview">
+        <i class="fas fa-times me-1"></i>Close Preview
+      </button>
+    </div>
+  </div>
+
+  {# ── Hybrid AI Report Action Card ──────────────────────────────────── #}
+  <div class="row g-4">
+    <div class="col-12">
       <div class="glass-card p-4">
-        <h5 class="fw-semibold mb-3">Password Exposure Audit</h5>
-        <p class="text-muted">Executive overview of weak patterns, entropy, and remediation status.</p>
-        <button class="btn btn-accent"><i class="fa-solid fa-download me-2"></i>Download CSV</button>
+        <div class="d-flex align-items-center gap-3 mb-3">
+          <div class="quick-action-icon bg-gradient-purple">
+            <i class="fas fa-robot"></i>
+          </div>
+          <div>
+            <h5 class="fw-semibold mb-0">Hybrid AI Analysis Report</h5>
+            <p class="text-muted small mb-0">
+              Full report including Rule Engine Analysis, ML Prediction, Confidence,
+              Agreement status, Decision Source, and Explainable AI reasoning.
+            </p>
+          </div>
+        </div>
+        <div class="d-flex gap-2 flex-wrap">
+          <button class="btn btn-accent" id="previewHybridBtn">
+            <i class="fas fa-eye me-2"></i>Preview Report
+          </button>
+          <a href="{{ url_for('auth.history') }}" class="btn btn-outline-light">
+            <i class="fas fa-history me-2"></i>View Full History
+          </a>
+          <a href="{{ url_for('auth.analytics') }}" class="btn btn-outline-light">
+            <i class="fas fa-chart-bar me-2"></i>Analytics Dashboard
+          </a>
+        </div>
       </div>
     </div>
   </div>
 </div>
+
+{# Pass API URL to report JS #}
+<div id="reportData"
+     data-history-url="{{ url_for('auth.api_breach_history') }}"
+     data-hybrid-url="{{ url_for('auth.api_hybrid_analytics') }}"
+     style="display:none;"></div>
+
+<script>
+'use strict';
+document.addEventListener('DOMContentLoaded', function () {
+  const previewBtn    = document.getElementById('previewHybridBtn');
+  const closeBtn      = document.getElementById('closeReportPreview');
+  const reportSection = document.getElementById('hybridReportSection');
+  const reportBody    = document.getElementById('reportTableBody');
+  const dlHybridBtn   = document.getElementById('downloadHybridCsvBtn');
+
+  const STRENGTH_COL = {
+    'Excellent':'#2ecc71','Strong':'#2ecc71','Moderate':'#3b82f6',
+    'Weak':'#f59e0b','Very Weak':'#ef4444'
+  };
+  const SOURCE_COL = {
+    'Hybrid Consensus':'#2ecc71','Machine Learning':'#a78bfa',
+    'Rule Engine':'#fcd34d','Weighted Decision':'#60a5fa','Breach Guard':'#fca5a5'
+  };
+
+  function badge(text, colour) {
+    return `<span style="background:${colour}22;color:${colour};border-radius:999px;padding:.2em .6em;font-size:.7rem;font-weight:700;">${text || '—'}</span>`;
+  }
+
+  let reportRows = [];
+
+  function loadHybridReport() {
+    fetch('/api/history/hybrid', { credentials: 'same-origin' })
+      .then(r => r.json())
+      .then(data => {
+        reportRows = data.rows || [];
+        if (!reportRows.length) {
+          reportBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">No Hybrid AI analyses found. Analyse a password first.</td></tr>';
+          return;
+        }
+        reportBody.innerHTML = reportRows.map(row => `
+          <tr>
+            <td><code style="background:rgba(239,68,68,0.1);color:#fca5a5;border-radius:4px;padding:.1em .4em;">${row.label}</code></td>
+            <td class="text-center">${badge(row.strength_category, STRENGTH_COL[row.strength_category] || '#94a3b8')}</td>
+            <td class="text-center">${badge(row.ml_prediction, STRENGTH_COL[row.ml_prediction] || '#94a3b8')}</td>
+            <td class="text-center"><span style="color:${row.ml_confidence >= 0.9 ? '#2ecc71' : row.ml_confidence >= 0.7 ? '#3b82f6' : '#f59e0b'};font-weight:600;font-size:.85rem;">${row.ml_confidence !== null ? (row.ml_confidence*100).toFixed(0)+'%' : '—'}</span></td>
+            <td class="text-center">${badge(row.hybrid_decision, STRENGTH_COL[row.hybrid_decision] || '#94a3b8')}</td>
+            <td class="text-center">${row.hybrid_agreement === true ? '<i class="fas fa-check-circle text-success"></i>' : row.hybrid_agreement === false ? '<i class="fas fa-times-circle text-warning"></i>' : '<span class="text-muted">—</span>'}</td>
+            <td><span style="color:${SOURCE_COL[row.decision_source] || '#94a3b8'};font-size:.8rem;">${row.decision_source || '—'}</span></td>
+            <td class="text-muted" style="font-size:.75rem;max-width:200px;white-space:normal;">${row.hybrid_reason ? row.hybrid_reason.substring(0,100)+'…' : '—'}</td>
+          </tr>
+        `).join('');
+      }).catch(() => {
+        reportBody.innerHTML = '<tr><td colspan="8" class="text-center text-muted py-4">Unable to load report data.</td></tr>';
+      });
+  }
+
+  if (previewBtn) {
+    previewBtn.addEventListener('click', function () {
+      reportSection.style.display = 'block';
+      reportSection.scrollIntoView({ behavior: 'smooth' });
+      loadHybridReport();
+    });
+  }
+
+  if (closeBtn) {
+    closeBtn.addEventListener('click', function () {
+      reportSection.style.display = 'none';
+    });
+  }
+
+  if (dlHybridBtn) {
+    dlHybridBtn.addEventListener('click', function () {
+      if (!reportRows.length) return;
+      const header = ['Label','Rule Result','ML Prediction','ML Confidence','Hybrid Decision','Agreement','Decision Source','AI Reason'];
+      const csvRows = reportRows.map(r => [
+        r.label, r.strength_category, r.ml_prediction || '',
+        r.ml_confidence !== null ? (r.ml_confidence*100).toFixed(1)+'%' : '',
+        r.hybrid_decision || '', r.hybrid_agreement === true ? 'Yes' : r.hybrid_agreement === false ? 'No' : '',
+        r.decision_source || '', (r.hybrid_reason || '').replace(/,/g,' ')
+      ]);
+      const csv = [header, ...csvRows].map(r => r.join(',')).join('\n');
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = 'secureguard_hybrid_ai_report.csv';
+      a.click();
+    });
+  }
+});
+</script>
 {% endblock %}

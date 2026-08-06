@@ -1325,3 +1325,459 @@ a:hover {
   background: rgba(46, 204, 113, 0.07);
   border-color: rgba(46, 204, 113, 0.2);
 }
+
+/* ========================================
+   HYBRID AI ANALYSIS PANEL
+   ======================================== */
+
+/* Individual meta cells (Rule / ML / Confidence / Agreement / Source / Final) */
+.hybrid-meta-item {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+  padding: 0.75rem 1rem;
+  transition: background 0.2s ease;
+}
+
+.hybrid-meta-item:hover {
+  background: rgba(0, 229, 255, 0.06);
+}
+
+.hybrid-meta-label {
+  font-size: 0.7rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #94a3b8;
+  margin-bottom: 0.3rem;
+}
+
+.hybrid-meta-value {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: #f8fafc;
+}
+
+/* Reason banner — colour-coded left border set dynamically by JS */
+.hybrid-reason-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-left: 4px solid var(--accent, #00e5ff);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  font-size: 0.88rem;
+  color: #f8fafc;
+  line-height: 1.6;
+}
+
+/* ========================================
+   BREACH INTELLIGENCE CENTER
+   ======================================== */
+
+/* ── Hero Banner ──────────────────────────────────────────────────────── */
+.breach-hero {
+  border-left: 4px solid #ef4444;
+  background: linear-gradient(135deg,
+    rgba(239, 68, 68, 0.08),
+    rgba(124, 77, 255, 0.06));
+}
+
+.breach-hero-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.breach-hero-stat {
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.breach-hero-stat-value {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--accent, #00e5ff);
+  line-height: 1.2;
+}
+
+.breach-hero-stat-label {
+  font-size: 0.7rem;
+  color: #94a3b8;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  margin-top: 0.2rem;
+}
+
+/* ── Status badge ─────────────────────────────────────────────────────── */
+.breach-status-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.6rem 1.25rem;
+  border-radius: 999px;
+  font-size: 1.1rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+}
+
+.breach-status-critical {
+  background: rgba(239, 68, 68, 0.18);
+  border: 1px solid rgba(239, 68, 68, 0.4);
+  color: #fca5a5;
+}
+
+.breach-status-warning {
+  background: rgba(245, 158, 11, 0.18);
+  border: 1px solid rgba(245, 158, 11, 0.4);
+  color: #fcd34d;
+}
+
+.breach-status-safe {
+  background: rgba(46, 204, 113, 0.14);
+  border: 1px solid rgba(46, 204, 113, 0.35);
+  color: #86efac;
+}
+
+/* ── Stat mini-cells ──────────────────────────────────────────────────── */
+.breach-stat-mini {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.2rem;
+  padding: 0.75rem;
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+/* ── Latest breach card ───────────────────────────────────────────────── */
+.breach-latest-card {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+/* ── Risk badge classes ───────────────────────────────────────────────── */
+.badge-risk-critical {
+  display: inline-block;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(239, 68, 68, 0.2);
+  color: #ef4444;
+}
+.badge-risk-high {
+  display: inline-block;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(249, 115, 22, 0.2);
+  color: #f97316;
+}
+.badge-risk-medium {
+  display: inline-block;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(245, 158, 11, 0.2);
+  color: #f59e0b;
+}
+.badge-risk-low {
+  display: inline-block;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(59, 130, 246, 0.2);
+  color: #3b82f6;
+}
+.badge-risk-safe {
+  display: inline-block;
+  padding: 0.3em 0.7em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  background: rgba(46, 204, 113, 0.2);
+  color: #2ecc71;
+}
+
+/* ── Masked password code tag ─────────────────────────────────────────── */
+.breach-label-code {
+  background: rgba(239, 68, 68, 0.1);
+  color: #fca5a5;
+  padding: 0.15em 0.5em;
+  border-radius: 6px;
+  font-family: 'Courier New', monospace;
+  font-size: 0.88rem;
+}
+
+/* ── Table row expand ─────────────────────────────────────────────────── */
+.breach-expand-content {
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.breach-table-row {
+  cursor: default;
+  transition: background 0.2s ease;
+}
+
+.breach-table-row:hover {
+  background: rgba(239, 68, 68, 0.05) !important;
+}
+
+/* ── Intelligence panel ───────────────────────────────────────────────── */
+.breach-attack-card {
+  background: rgba(239, 68, 68, 0.07);
+  border: 1px solid rgba(239, 68, 68, 0.18);
+  border-radius: 12px;
+  padding: 0.85rem 1rem;
+  transition: background 0.2s ease;
+}
+
+.breach-attack-card:hover {
+  background: rgba(239, 68, 68, 0.12);
+}
+
+.breach-attack-title {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: #f8fafc;
+  margin-bottom: 0.4rem;
+}
+
+.breach-impact-item {
+  padding: 0.4rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.breach-impact-item:last-child {
+  border-bottom: none;
+}
+
+.breach-explanation-box {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 14px;
+  padding: 1rem;
+}
+
+/* ── Timeline ─────────────────────────────────────────────────────────── */
+.breach-timeline {
+  position: relative;
+  padding-left: 2.5rem;
+}
+
+.breach-timeline-item {
+  position: relative;
+  padding-bottom: 1.5rem;
+  padding-left: 1.25rem;
+}
+
+.breach-timeline-item--breach {
+  border-left: 2px solid rgba(239, 68, 68, 0.3);
+}
+
+.breach-timeline-item:not(.breach-timeline-item--breach) {
+  border-left: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.breach-timeline-item:last-child {
+  padding-bottom: 0;
+  border-left-color: transparent !important;
+}
+
+.breach-timeline-icon {
+  position: absolute;
+  left: -1.1rem;
+  top: 2px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: #fff;
+  flex-shrink: 0;
+}
+
+.timeline-icon-danger  { background: linear-gradient(135deg, #ef4444, #dc2626); }
+.timeline-icon-warning { background: linear-gradient(135deg, #f59e0b, #d97706); }
+.timeline-icon-success { background: linear-gradient(135deg, #2ecc71, #16a34a); }
+.timeline-icon-info    { background: linear-gradient(135deg, #3b82f6, #2563eb); }
+
+.breach-timeline-body {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 10px;
+  padding: 0.6rem 0.9rem;
+}
+
+.breach-timeline-item--breach .breach-timeline-body {
+  background: rgba(239, 68, 68, 0.07);
+  border-color: rgba(239, 68, 68, 0.2);
+}
+
+/* ── Pagination (reuse history page style) ────────────────────────────── */
+.breach-page-link:hover,
+.page-item.active .breach-page-link {
+  background: var(--accent, #00e5ff);
+  border-color: var(--accent, #00e5ff);
+  color: #0f172a;
+}
+
+/* ── bg-gradient-purple utility (for Quick Actions) ──────────────────── */
+.bg-gradient-purple {
+  background: linear-gradient(135deg, #7c4dff, #5e35b1);
+}
+
+/* ========================================
+   AI SECURITY COACH PAGE
+   ======================================== */
+
+/* Hero */
+.coach-hero {
+  border-left: 4px solid var(--accent, #00e5ff);
+  background: linear-gradient(135deg,
+    rgba(0, 229, 255, 0.07), rgba(124, 77, 255, 0.06));
+}
+.coach-hero-icon {
+  width: 56px; height: 56px; border-radius: 14px; flex-shrink: 0;
+  background: linear-gradient(135deg, #00e5ff, #7c4dff);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.5rem; color: #fff;
+}
+.coach-hero-stat        { border: 1px solid rgba(255,255,255,0.07); }
+.coach-hero-stat-value  { font-size: 1.3rem; font-weight: 700; color: var(--accent,#00e5ff); line-height:1.2; }
+.coach-hero-stat-label  { font-size: 0.68rem; color: #94a3b8; text-transform: uppercase; letter-spacing:.04em; margin-top:.15rem; }
+
+/* Health score circle */
+.coach-score-circle {
+  width: 110px; height: 110px; border-radius: 50%;
+  border: 4px solid rgba(0, 229, 255, 0.3);
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: rgba(0, 229, 255, 0.05);
+}
+.coach-score-value { font-size: 2.2rem; font-weight: 800; line-height: 1; }
+
+/* Weakness cards */
+.coach-weakness-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: .85rem 1rem;
+}
+
+/* Suggestion cards */
+.coach-suggestion-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: .85rem 1rem;
+  transition: all .25s ease;
+}
+.coach-suggestion-card:hover {
+  border-color: rgba(0,229,255,0.25);
+  background: rgba(0,229,255,0.05);
+}
+.coach-suggestion-icon {
+  width: 34px; height: 34px; border-radius: 9px; flex-shrink:0;
+  background: linear-gradient(135deg,rgba(0,229,255,0.25),rgba(124,77,255,0.2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:.9rem; color: var(--accent,#00e5ff);
+}
+
+/* Attack insight cards */
+.coach-attack-card {
+  background: rgba(239,68,68,0.06);
+  border: 1px solid rgba(239,68,68,0.18);
+  border-radius: 14px; padding: .85rem 1rem;
+  transition: all .25s ease;
+}
+.coach-attack-card:hover {
+  background: rgba(239,68,68,0.1); transform: translateY(-2px);
+}
+.coach-attack-icon {
+  width: 36px; height: 36px; border-radius: 9px; flex-shrink:0;
+  background: linear-gradient(135deg,rgba(239,68,68,0.3),rgba(220,38,38,0.2));
+  display:flex; align-items:center; justify-content:center;
+  font-size:.9rem; color:#fca5a5;
+}
+.coach-mitigation {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 8px; padding: .4rem .7rem;
+  color: #94a3b8;
+}
+
+/* Learning center cards */
+.coach-learn-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 1rem;
+  transition: all .25s ease; height: 100%;
+}
+.coach-learn-card:hover {
+  border-color: rgba(0,229,255,0.2);
+  background: rgba(0,229,255,0.04);
+  transform: translateY(-2px);
+}
+.coach-learn-icon {
+  width: 38px; height: 38px; border-radius: 10px; flex-shrink:0;
+  background: linear-gradient(135deg,rgba(0,229,255,0.22),rgba(124,77,255,0.18));
+  display:flex; align-items:center; justify-content:center;
+  font-size:.95rem; color: var(--accent,#00e5ff);
+}
+
+/* Q&A accordion */
+.coach-qna-item {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.07) !important;
+  border-radius: 12px !important; margin-bottom: .5rem;
+  overflow: hidden;
+}
+.coach-qna-btn {
+  background: rgba(255,255,255,0.04) !important;
+  color: var(--text,#f8fafc) !important;
+  font-weight: 600; font-size: .9rem;
+  border: none !important; box-shadow: none !important;
+}
+.coach-qna-btn:not(.collapsed) {
+  background: rgba(0,229,255,0.08) !important;
+  color: var(--accent,#00e5ff) !important;
+}
+.coach-qna-body {
+  background: rgba(255,255,255,0.03) !important;
+  color: #cbd5e1; font-size: .88rem; line-height: 1.7;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Achievement cards */
+.coach-achievement-card {
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px; padding: 1rem; text-align: center;
+  transition: all .25s ease;
+}
+.coach-achievement-locked {
+  opacity: .55; filter: grayscale(60%);
+}
+.coach-achievement-icon {
+  font-size: 2rem; margin-bottom: .5rem; display:block;
+}
+
+/* Responsive tweaks */
+@media (max-width: 767px) {
+  .coach-score-circle { width: 90px; height: 90px; }
+  .coach-score-value  { font-size: 1.8rem; }
+}

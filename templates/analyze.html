@@ -315,6 +315,99 @@
       </div>
     </div>{# /Breach Panel #}
 
+    {# ── Hybrid AI Analysis ──────────────────────────────────────────────── #}
+    <div class="row g-4 mb-4">
+      <div class="col-12" data-aos="fade-up">
+        <div id="hybridPanel" class="glass-card p-4">
+
+          {# Panel header #}
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5 class="fw-semibold mb-0">
+              <i class="fas fa-brain text-accent me-2"></i>Hybrid AI Analysis
+            </h5>
+            <span id="hybridSourceBadge" class="badge px-3 py-2">—</span>
+          </div>
+
+          {# ML unavailable notice (shown only on fallback) #}
+          <div id="hybridUnavailable" class="d-none">
+            <div class="alert alert-warning d-flex align-items-center gap-2 mb-0" role="alert">
+              <i class="fas fa-exclamation-triangle"></i>
+              <span id="hybridUnavailableMsg">Machine Learning temporarily unavailable.</span>
+            </div>
+          </div>
+
+          {# Main hybrid grid (shown when ML is available) #}
+          <div id="hybridGrid" class="d-none">
+            <div class="row g-3 mb-3">
+
+              <div class="col-sm-6 col-md-4">
+                <div class="hybrid-meta-item">
+                  <div class="hybrid-meta-label">
+                    <i class="fas fa-ruler-combined me-1"></i>Rule Engine
+                  </div>
+                  <div class="hybrid-meta-value" id="hybridRuleVal">—</div>
+                </div>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <div class="hybrid-meta-item">
+                  <div class="hybrid-meta-label">
+                    <i class="fas fa-robot me-1"></i>ML Prediction
+                  </div>
+                  <div class="hybrid-meta-value" id="hybridMlVal">—</div>
+                </div>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <div class="hybrid-meta-item">
+                  <div class="hybrid-meta-label">
+                    <i class="fas fa-percent me-1"></i>ML Confidence
+                  </div>
+                  <div class="hybrid-meta-value" id="hybridConfVal">—</div>
+                </div>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <div class="hybrid-meta-item">
+                  <div class="hybrid-meta-label">
+                    <i class="fas fa-handshake me-1"></i>Agreement
+                  </div>
+                  <div class="hybrid-meta-value" id="hybridAgreementVal">—</div>
+                </div>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <div class="hybrid-meta-item">
+                  <div class="hybrid-meta-label">
+                    <i class="fas fa-code-branch me-1"></i>Decision Source
+                  </div>
+                  <div class="hybrid-meta-value" id="hybridSourceVal">—</div>
+                </div>
+              </div>
+
+              <div class="col-sm-6 col-md-4">
+                <div class="hybrid-meta-item">
+                  <div class="hybrid-meta-label">
+                    <i class="fas fa-shield-halved me-1"></i>Final Decision
+                  </div>
+                  <div class="hybrid-meta-value fw-bold" id="hybridFinalVal">—</div>
+                </div>
+              </div>
+
+            </div>
+
+            {# Reason banner #}
+            <div class="hybrid-reason-box" id="hybridReasonBox">
+              <i class="fas fa-comment-dots text-accent me-2"></i>
+              <span id="hybridReasonText">—</span>
+            </div>
+
+          </div>{# /hybridGrid #}
+
+        </div>
+      </div>
+    </div>{# /Hybrid AI Panel #}
+
     {# Saved confirmation #}
     <div class="row g-4 mb-4">
       <div class="col-12" data-aos="fade-up">

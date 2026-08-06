@@ -1,0 +1,566 @@
+{% extends "base.html" %}
+{% block title %}Breach Intelligence Center | SecureGuard AI{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 py-4">
+
+  {# ══════════════════════════════════════════════════════════════════════
+     SECTION 1 — Hero Banner
+  ══════════════════════════════════════════════════════════════════════ #}
+  <div class="breach-hero glass-card p-4 mb-4" data-aos="fade-down">
+    <div class="row align-items-center g-3">
+      <div class="col-lg-6">
+        <div class="d-flex align-items-center gap-3 mb-2">
+          <div class="breach-hero-icon">
+            <i class="fas fa-radiation"></i>
+          </div>
+          <div>
+            <h2 class="fw-bold mb-0">Breach Intelligence Center</h2>
+            <p class="text-muted mb-0">
+              Monitor compromised passwords, understand breach exposure, and receive
+              AI-driven remediation guidance.
+            </p>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6">
+        <div class="row g-3 text-center">
+          <div class="col-4">
+            <div class="breach-hero-stat glass-card p-3">
+              <div class="breach-hero-stat-value">{{ summary.last_scan_time }}</div>
+              <div class="breach-hero-stat-label">Last Scan</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="breach-hero-stat glass-card p-3">
+              <div class="breach-hero-stat-value">{{ summary.total_checks }}</div>
+              <div class="breach-hero-stat-label">Total Checks</div>
+            </div>
+          </div>
+          <div class="col-4">
+            <div class="breach-hero-stat glass-card p-3">
+              <div class="breach-hero-stat-value
+                {% if summary.overall_status == 'Critical' %}text-danger
+                {% elif summary.overall_status == 'Warning' %}text-warning
+                {% else %}text-success{% endif %}">
+                {{ summary.overall_status }}
+              </div>
+              <div class="breach-hero-stat-label">Security Status</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ══════════════════════════════════════════════════════════════════════
+     SECTION 2 — Security Status Card
+  ══════════════════════════════════════════════════════════════════════ #}
+  <div class="row g-4 mb-4">
+    <div class="col-lg-5" data-aos="fade-up">
+      <div class="glass-card p-4 h-100">
+        <h5 class="fw-semibold mb-3">
+          <i class="fas fa-shield-halved text-accent me-2"></i>Overall Security Status
+        </h5>
+
+        {# Status badge #}
+        <div class="breach-status-badge
+          {% if summary.overall_status == 'Critical' %}breach-status-critical
+          {% elif summary.overall_status == 'Warning' %}breach-status-warning
+          {% else %}breach-status-safe{% endif %} mb-4">
+          <i class="fas fa-{% if summary.overall_status == 'Critical' %}radiation
+            {% elif summary.overall_status == 'Warning' %}exclamation-triangle
+            {% else %}shield-check{% endif %} me-2"></i>
+          {{ summary.overall_status }}
+        </div>
+
+        <div class="row g-2 mb-3">
+          <div class="col-6">
+            <div class="breach-stat-mini">
+              <span class="text-muted small">Breached Passwords</span>
+              <span class="fw-bold text-danger fs-4">{{ summary.total_breached }}</span>
+            </div>
+          </div>
+          <div class="col-6">
+            <div class="breach-stat-mini">
+              <span class="text-muted small">Breach Rate</span>
+              <span class="fw-bold
+                {% if summary.breach_rate_pct >= 20 %}text-danger
+                {% elif summary.breach_rate_pct > 0 %}text-warning
+                {% else %}text-success{% endif %} fs-4">
+                {{ summary.breach_rate_pct }}%
+              </span>
+            </div>
+          </div>
+        </div>
+
+        {# Latest breach card #}
+        {% if summary.latest_breach %}
+        <div class="breach-latest-card">
+          <div class="d-flex justify-content-between align-items-start mb-2">
+            <span class="text-muted small fw-semibold">LATEST BREACH DETECTED</span>
+            <span class="{{ summary.latest_breach.badge_class }}">
+              {{ summary.latest_breach.risk }}
+            </span>
+          </div>
+          <div class="d-flex align-items-center gap-2 mb-1">
+            <i class="fas fa-lock text-danger"></i>
+            <code class="breach-label-code">{{ summary.latest_breach.label }}</code>
+          </div>
+          <div class="d-flex gap-3">
+            <span class="text-muted small">
+              <i class="fas fa-database me-1"></i>{{ summary.latest_breach.source }}
+            </span>
+            <span class="text-muted small">
+              <i class="fas fa-clock me-1"></i>{{ summary.latest_breach.detected }}
+            </span>
+          </div>
+        </div>
+        {% else %}
+        <div class="text-center py-3">
+          <i class="fas fa-shield-check fa-2x text-success mb-2"></i>
+          <p class="text-muted small mb-0">No breached passwords detected.</p>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    {# ── Section 6: Risk Distribution Chart ──────────────────────────── #}
+    <div class="col-lg-4" data-aos="fade-up" data-aos-delay="100">
+      <div class="glass-card p-4 h-100">
+        <h5 class="fw-semibold mb-3">
+          <i class="fas fa-chart-pie text-accent me-2"></i>Risk Distribution
+        </h5>
+        <div style="position:relative;height:220px;">
+          <canvas id="breachRiskChart"></canvas>
+        </div>
+        <div class="mt-3" id="riskChartLegend">
+          {% for label, colour, count in [
+            ('Critical', '#ef4444', risk_chart.data[0]),
+            ('High',     '#f97316', risk_chart.data[1]),
+            ('Medium',   '#f59e0b', risk_chart.data[2]),
+            ('Low',      '#3b82f6', risk_chart.data[3])
+          ] %}
+          <div class="d-flex justify-content-between mb-1">
+            <span class="small text-muted">
+              <i class="fas fa-circle me-1" style="color:{{ colour }};font-size:0.55rem;"></i>
+              {{ label }}
+            </span>
+            <span class="small fw-semibold">{{ count }}</span>
+          </div>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+
+    {# ── Quick Security Actions ─────────────────────────────────────── #}
+    <div class="col-lg-3" data-aos="fade-up" data-aos-delay="200">
+      <div class="glass-card p-4 h-100">
+        <h5 class="fw-semibold mb-3">
+          <i class="fas fa-bolt text-accent me-2"></i>Quick Actions
+        </h5>
+        <div class="d-grid gap-3">
+          <a href="{{ url_for('auth.analyzer') }}" class="quick-action-btn">
+            <div class="d-flex align-items-center gap-3">
+              <div class="quick-action-icon bg-gradient-primary">
+                <i class="fas fa-microscope"></i>
+              </div>
+              <div>
+                <div class="action-title">Analyse Password</div>
+                <small class="text-muted">Run a new analysis</small>
+              </div>
+            </div>
+          </a>
+          <a href="{{ url_for('auth.analyzer') }}" class="quick-action-btn">
+            <div class="d-flex align-items-center gap-3">
+              <div class="quick-action-icon bg-gradient-success">
+                <i class="fas fa-wand-magic-sparkles"></i>
+              </div>
+              <div>
+                <div class="action-title">Generate Secure Password</div>
+                <small class="text-muted">Create a strong password</small>
+              </div>
+            </div>
+          </a>
+          <a href="{{ url_for('auth.reports') }}" class="quick-action-btn">
+            <div class="d-flex align-items-center gap-3">
+              <div class="quick-action-icon bg-gradient-info">
+                <i class="fas fa-file-pdf"></i>
+              </div>
+              <div>
+                <div class="action-title">Download Breach Report</div>
+                <small class="text-muted">Export security analysis</small>
+              </div>
+            </div>
+          </a>
+          <a href="{{ url_for('auth.history') }}" class="quick-action-btn">
+            <div class="d-flex align-items-center gap-3">
+              <div class="quick-action-icon bg-gradient-purple">
+                <i class="fas fa-history"></i>
+              </div>
+              <div>
+                <div class="action-title">View Full History</div>
+                <small class="text-muted">All past analyses</small>
+              </div>
+            </div>
+          </a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  {# ══════════════════════════════════════════════════════════════════════
+     SECTION 3 — Breach History Table
+  ══════════════════════════════════════════════════════════════════════ #}
+  <div class="glass-card p-4 mb-4" data-aos="fade-up">
+    <div class="d-flex justify-content-between align-items-center mb-3 flex-wrap gap-2">
+      <h5 class="fw-semibold mb-0">
+        <i class="fas fa-table text-accent me-2"></i>
+        Breach History
+        <span class="badge bg-danger ms-2">{{ history.total }}</span>
+      </h5>
+      <div class="d-flex gap-2 align-items-center">
+        <div class="input-group search-box" style="width:240px;">
+          <span class="input-group-text bg-transparent border-end-0">
+            <i class="fas fa-search text-muted"></i>
+          </span>
+          <input type="text" class="form-control border-start-0"
+                 id="breachSearchInput" placeholder="Search passwords…">
+        </div>
+        <select class="form-select form-select-sm" id="breachSortSelect"
+                style="width:auto;">
+          <option value="date_desc">Newest First</option>
+          <option value="date_asc">Oldest First</option>
+          <option value="risk_desc">Highest Risk</option>
+          <option value="risk_asc">Lowest Risk</option>
+        </select>
+      </div>
+    </div>
+
+    {% if history.rows %}
+    <div class="table-responsive">
+      <table class="table table-hover align-middle mb-0" id="breachTable">
+        <thead>
+          <tr>
+            <th class="text-muted small">Masked Password</th>
+            <th class="text-muted small text-center">Risk Level</th>
+            <th class="text-muted small">Source</th>
+            <th class="text-muted small text-center">Score</th>
+            <th class="text-muted small">Analysis Date</th>
+            <th class="text-muted small text-center">Status</th>
+            <th class="text-muted small text-center">Details</th>
+          </tr>
+        </thead>
+        <tbody id="breachTableBody">
+          {% for row in history.rows %}
+          <tr class="breach-table-row"
+              data-row="{{ row | tojson | e }}"
+              data-id="{{ row.id }}">
+            <td>
+              <div class="d-flex align-items-center gap-2">
+                <i class="fas fa-lock text-danger" style="font-size:0.85rem;"></i>
+                <code class="breach-label-code">{{ row.label }}</code>
+              </div>
+            </td>
+            <td class="text-center">
+              <span class="{{ row.badge_class }}">{{ row.risk }}</span>
+            </td>
+            <td class="text-muted small">{{ row.source }}</td>
+            <td class="text-center">
+              <span class="badge" style="
+                background: {% if row.score < 20 %}rgba(239,68,68,0.2){% elif row.score < 35 %}rgba(249,115,22,0.2){% else %}rgba(245,158,11,0.2){% endif %};
+                color: {% if row.score < 20 %}#ef4444{% elif row.score < 35 %}#f97316{% else %}#f59e0b{% endif %};">
+                {{ row.score }}/100
+              </span>
+            </td>
+            <td class="text-muted small text-nowrap">{{ row.analyzed_at }}</td>
+            <td class="text-center">
+              <span class="badge bg-danger" style="font-size:0.7rem;">
+                <i class="fas fa-radiation me-1"></i>Breached
+              </span>
+            </td>
+            <td class="text-center">
+              <button class="btn btn-sm btn-outline-light breach-detail-btn py-1 px-2"
+                      data-id="{{ row.id }}">
+                <i class="fas fa-chevron-down"></i>
+              </button>
+            </td>
+          </tr>
+          {# Expandable detail row (hidden until button clicked) #}
+          <tr class="breach-expand-row d-none" id="expand-{{ row.id }}">
+            <td colspan="7" class="p-0">
+              <div class="breach-expand-content p-3">
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <p class="text-muted small mb-1">
+                      <i class="fas fa-entropy me-1"></i>
+                      <strong>Entropy:</strong> {{ row.entropy }} bits
+                    </p>
+                    <p class="text-muted small mb-1">
+                      <strong>Length:</strong> {{ row.length }} characters
+                    </p>
+                    <p class="text-muted small mb-0">
+                      <strong>Detected:</strong> {{ row.time_ago }}
+                    </p>
+                  </div>
+                  <div class="col-md-6">
+                    <p class="text-muted small mb-1">
+                      <strong>Dictionary word:</strong>
+                      {{ 'Yes ⚠' if row.dictionary_word else 'No' }}
+                    </p>
+                    <p class="text-muted small mb-1">
+                      <strong>Keyboard pattern:</strong>
+                      {{ 'Yes ⚠' if row.keyboard_pattern else 'No' }}
+                    </p>
+                    <p class="text-muted small mb-0">
+                      <strong>Strength category:</strong>
+                      {{ row.strength_category }}
+                    </p>
+                  </div>
+                </div>
+                <button class="btn btn-accent btn-sm mt-2 breach-select-btn"
+                        data-id="{{ row.id }}"
+                        data-row="{{ row | tojson | e }}">
+                  <i class="fas fa-crosshairs me-1"></i>Full Intelligence Report
+                </button>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+    {# Pagination #}
+    {% if history.pages > 1 %}
+    <nav class="mt-3" id="breachPagination">
+      <ul class="pagination justify-content-end mb-0 gap-1">
+        <li class="page-item {{ 'disabled' if not history.has_prev }}">
+          <a class="page-link breach-page-link"
+             href="#" data-page="{{ history.page - 1 }}">
+            <i class="fas fa-chevron-left"></i>
+          </a>
+        </li>
+        {% for p in range(1, history.pages + 1) %}
+        <li class="page-item {{ 'active' if p == history.page }}">
+          <a class="page-link breach-page-link" href="#" data-page="{{ p }}">{{ p }}</a>
+        </li>
+        {% endfor %}
+        <li class="page-item {{ 'disabled' if not history.has_next }}">
+          <a class="page-link breach-page-link"
+             href="#" data-page="{{ history.page + 1 }}">
+            <i class="fas fa-chevron-right"></i>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    {% endif %}
+
+    {% else %}
+    <div class="text-center py-5">
+      <i class="fas fa-shield-check fa-3x text-success mb-3"></i>
+      <h6 class="text-muted">No breached passwords found</h6>
+      <p class="text-muted small">
+        Your analysed passwords have not appeared in known breach datasets.
+      </p>
+      <a href="{{ url_for('auth.analyzer') }}" class="btn btn-accent">
+        <i class="fas fa-microscope me-2"></i>Analyse a Password
+      </a>
+    </div>
+    {% endif %}
+  </div>
+
+  {# ══════════════════════════════════════════════════════════════════════
+     SECTION 4 — Selected Breach Intelligence Panel (shown on row select)
+  ══════════════════════════════════════════════════════════════════════ #}
+  <div id="breachIntelPanel" class="mb-4 d-none" data-aos="fade-up">
+    <div class="glass-card p-4">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h5 class="fw-semibold mb-0">
+          <i class="fas fa-crosshairs text-danger me-2"></i>
+          Breach Intelligence Report
+        </h5>
+        <button class="btn btn-outline-light btn-sm" id="closeIntelBtn">
+          <i class="fas fa-times me-1"></i>Close
+        </button>
+      </div>
+
+      {# Exposure summary #}
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="hybrid-meta-item text-center">
+            <div class="hybrid-meta-label">Password</div>
+            <code class="breach-label-code" id="intelLabel">—</code>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="hybrid-meta-item text-center">
+            <div class="hybrid-meta-label">Risk Level</div>
+            <span id="intelRisk" class="fw-bold fs-5">—</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="hybrid-meta-item text-center">
+            <div class="hybrid-meta-label">Breach Source</div>
+            <span class="text-muted small" id="intelSource">—</span>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="hybrid-meta-item text-center">
+            <div class="hybrid-meta-label">Strength Score</div>
+            <span class="fw-bold text-danger" id="intelScore">—</span>
+          </div>
+        </div>
+      </div>
+
+      {# Attack Scenarios #}
+      <h6 class="fw-semibold mb-3">
+        <i class="fas fa-crosshairs text-warning me-2"></i>Attack Scenarios
+      </h6>
+      <div class="row g-3 mb-4" id="intelAttacks">
+        {% for name, desc in [
+          ('Credential Stuffing',
+           'Attackers test leaked pairs across hundreds of sites automatically.'),
+          ('Password Spraying',
+           'Common breached passwords are tried against thousands of accounts daily.'),
+          ('Account Takeover',
+           'Access to one account leads to email, banking, and corporate exposure.'),
+          ('Reuse Risk',
+           'The same password on 5+ services multiplies breach impact dramatically.')
+        ] %}
+        <div class="col-md-6">
+          <div class="breach-attack-card">
+            <div class="breach-attack-title">
+              <i class="fas fa-skull-crossbones text-danger me-2"></i>{{ name }}
+            </div>
+            <p class="text-muted small mb-0">{{ desc }}</p>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {# Business Impact #}
+      <h6 class="fw-semibold mb-3">
+        <i class="fas fa-building text-warning me-2"></i>Business Impact
+      </h6>
+      <div class="row g-2 mb-4">
+        {% for item in [
+          ('fas fa-dollar-sign', 'Financial account access and wire fraud'),
+          ('fas fa-envelope',    'Email takeover enabling phishing campaigns'),
+          ('fas fa-database',    'Corporate data exfiltration if work accounts reuse passwords'),
+          ('fas fa-id-card',     'Identity theft and fraudulent account creation')
+        ] %}
+        <div class="col-md-6">
+          <div class="d-flex align-items-center gap-2 breach-impact-item">
+            <i class="{{ item[0] }} text-danger" style="width:18px;"></i>
+            <span class="text-muted small">{{ item[1] }}</span>
+          </div>
+        </div>
+        {% endfor %}
+      </div>
+
+      {# Technical + Source explanation #}
+      <div class="row g-3">
+        <div class="col-md-6">
+          <div class="breach-explanation-box">
+            <h6 class="fw-semibold mb-2">
+              <i class="fas fa-code text-accent me-2"></i>Technical Analysis
+            </h6>
+            <p class="text-muted small mb-0" id="intelTechnical">
+              Select a breach record above to see its technical analysis.
+            </p>
+          </div>
+        </div>
+        <div class="col-md-6">
+          <div class="breach-explanation-box">
+            <h6 class="fw-semibold mb-2">
+              <i class="fas fa-database text-accent me-2"></i>About the Breach Source
+            </h6>
+            <p class="text-muted small mb-0">
+              This password was matched against the <strong>RockYou breach dataset</strong> —
+              a corpus of over 14 million real-world passwords leaked in 2009.
+              It is the benchmark dataset used by security researchers worldwide.
+              Any password appearing in this list is known to automated attack tools.
+            </p>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  {# ══════════════════════════════════════════════════════════════════════
+     SECTION 5 — AI Security Recommendations
+  ══════════════════════════════════════════════════════════════════════ #}
+  <div class="glass-card p-4 mb-4" data-aos="fade-up">
+    <h5 class="fw-semibold mb-3">
+      <i class="fas fa-robot text-accent me-2"></i>AI Security Recommendations
+      <span class="badge-soft ms-2" id="recsRiskLabel">
+        {{ summary.overall_status }}
+      </span>
+    </h5>
+    <div class="row g-3" id="recsContainer">
+      {% for rec in recs %}
+      <div class="col-md-6 col-lg-3">
+        <div class="ai-insight-card h-100">
+          <div class="ai-insight-icon">
+            <i class="{{ rec.icon }}"></i>
+          </div>
+          <div class="ai-insight-content">
+            <h6 class="mb-1">{{ rec.title }}</h6>
+            <p class="text-muted small mb-2">{{ rec.body }}</p>
+            <span class="badge {{ rec.badge }}">{{ rec.badge_text }}</span>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  {# ══════════════════════════════════════════════════════════════════════
+     SECTION 7 — Breach Timeline
+  ══════════════════════════════════════════════════════════════════════ #}
+  <div class="glass-card p-4 mb-4" data-aos="fade-up">
+    <h5 class="fw-semibold mb-3">
+      <i class="fas fa-timeline text-accent me-2"></i>Security Activity Timeline
+    </h5>
+    {% if timeline %}
+    <div class="breach-timeline">
+      {% for item in timeline %}
+      <div class="breach-timeline-item {% if item.is_breach %}breach-timeline-item--breach{% endif %}">
+        <div class="breach-timeline-connector"></div>
+        <div class="breach-timeline-icon {{ item.icon_class }}">
+          <i class="{{ item.icon }}"></i>
+        </div>
+        <div class="breach-timeline-body">
+          <div class="d-flex justify-content-between align-items-start flex-wrap gap-1">
+            <strong class="small">{{ item.title }}</strong>
+            <span class="text-muted" style="font-size:0.72rem;">
+              {{ item.date_label }} · {{ item.time }}
+            </span>
+          </div>
+          <p class="text-muted mb-0" style="font-size:0.8rem;">{{ item.sub }}</p>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-4">
+      <i class="fas fa-clock fa-2x text-muted mb-2"></i>
+      <p class="text-muted small mb-0">No activity recorded yet.</p>
+    </div>
+    {% endif %}
+  </div>
+
+</div>{# /container-fluid #}
+
+{# Data island for breach.js — passes chart data and API URL #}
+<div id="breachPageData"
+     data-risk-labels="{{ risk_chart.labels | tojson | e }}"
+     data-risk-data="{{ risk_chart.data | tojson | e }}"
+     data-risk-colours="{{ risk_chart.colours | tojson | e }}"
+     data-api-history="{{ url_for('auth.api_breach_history') }}"
+     style="display:none;"></div>
+
+<script src="{{ url_for('static', filename='js/breach.js') }}"></script>
+{% endblock %}

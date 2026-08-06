@@ -39,8 +39,8 @@
         <ul class="nav flex-column gap-2">
           <li><a class="sidebar-link{% if request.endpoint == 'auth.dashboard' %} active{% endif %}" href="{{ url_for('auth.dashboard') }}"><i class="fas fa-home me-2"></i>Dashboard</a></li>
           <li><a class="sidebar-link{% if request.endpoint == 'auth.analyzer' %} active{% endif %}" href="{{ url_for('auth.analyzer') }}"><i class="fas fa-lock me-2"></i>Password Analyzer</a></li>
-          <li><a class="sidebar-link" href="#"><i class="fas fa-exclamation-triangle me-2"></i>Breach Detection</a></li>
-          <li><a class="sidebar-link" href="#"><i class="fas fa-robot me-2"></i>AI Security Coach</a></li>
+          <li><a class="sidebar-link{% if request.endpoint == 'auth.breach_detection' %} active{% endif %}" href="{{ url_for('auth.breach_detection') }}"><i class="fas fa-exclamation-triangle me-2"></i>Breach Detection</a></li>
+          <li><a class="sidebar-link{% if request.endpoint == 'auth.ai_security_coach' %} active{% endif %}" href="{{ url_for('auth.ai_security_coach') }}"><i class="fas fa-robot me-2"></i>AI Security Coach</a></li>
           <li><a class="sidebar-link{% if request.endpoint == 'auth.analytics' %} active{% endif %}" href="{{ url_for('auth.analytics') }}"><i class="fas fa-chart-bar me-2"></i>Analytics</a></li>
           <li><a class="sidebar-link{% if request.endpoint == 'auth.reports' %} active{% endif %}" href="{{ url_for('auth.reports') }}"><i class="fas fa-file-alt me-2"></i>Reports</a></li>
           <li><a class="sidebar-link{% if request.endpoint == 'auth.history' %} active{% endif %}" href="{{ url_for('auth.history') }}"><i class="fas fa-history me-2"></i>History</a></li>

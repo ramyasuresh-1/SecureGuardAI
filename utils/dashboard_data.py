@@ -802,3 +802,160 @@ def _time_ago(dt: datetime) -> str:
         return f"{days} days ago"
     months = days // 30
     return f"{months} month{'s' if months > 1 else ''} ago"
+
+# ---------------------------------------------------------------------------
+# 8. Hybrid AI Analytics helpers
+# ---------------------------------------------------------------------------
+
+_HYBRID_DECISION_ORDER = [
+    "Very Weak", "Weak", "Moderate", "Strong", "Excellent"
+]
+
+_DECISION_SOURCES = [
+    "Hybrid Consensus",
+    "Machine Learning",
+    "Rule Engine",
+    "Weighted Decision",
+    "Breach Guard",
+]
+
+
+def get_hybrid_decision_distribution(user_id: int) -> dict[str, Any]:
+    """
+    Count how many analyses ended in each Hybrid AI final decision tier.
+
+    Returns Chart.js-ready labels + data arrays.
+    Rows with NULL hybrid_decision (saved before this feature) are excluded.
+    """
+    rows = (
+        db.session.query(
+            PasswordAnalysis.hybrid_decision,
+            func.count(PasswordAnalysis.id).label("cnt"),
+        )
+        .filter(
+            PasswordAnalysis.user_id == user_id,
+            PasswordAnalysis.hybrid_decision.isnot(None),
+        )
+        .group_by(PasswordAnalysis.hybrid_decision)
+        .all()
+    )
+
+    counts: dict[str, int] = {cat: 0 for cat in _HYBRID_DECISION_ORDER}
+    for cat, cnt in rows:
+        if cat in counts:
+            counts[cat] = cnt
+
+    return {
+        "labels": _HYBRID_DECISION_ORDER,
+        "data":   [counts[c] for c in _HYBRID_DECISION_ORDER],
+        "total":  sum(counts.values()),
+    }
+
+
+def get_rule_ml_agreement_data(user_id: int) -> dict[str, Any]:
+    """
+    Count analyses where Rule Engine and ML agreed vs disagreed.
+
+    Returns Chart.js-ready labels + data for a pie/doughnut chart.
+    """
+    base = PasswordAnalysis.query.filter(
+        PasswordAnalysis.user_id == user_id,
+        PasswordAnalysis.hybrid_agreement.isnot(None),
+    )
+
+    agreed    = base.filter(PasswordAnalysis.hybrid_agreement == True).count()   # noqa: E712
+    disagreed = base.filter(PasswordAnalysis.hybrid_agreement == False).count()  # noqa: E712
+
+    return {
+        "labels": ["Agreed", "Disagreed"],
+        "data":   [agreed, disagreed],
+        "total":  agreed + disagreed,
+    }
+
+
+def get_avg_ml_confidence(user_id: int) -> dict[str, Any]:
+    """
+    Return the average ML confidence per strength category as a bar chart.
+
+    Only rows with non-NULL ml_confidence are considered.
+    """
+    rows = (
+        db.session.query(
+            PasswordAnalysis.hybrid_decision,
+            func.round(func.avg(PasswordAnalysis.ml_confidence), 3).label("avg_conf"),
+        )
+        .filter(
+            PasswordAnalysis.user_id == user_id,
+            PasswordAnalysis.ml_confidence.isnot(None),
+            PasswordAnalysis.hybrid_decision.isnot(None),
+        )
+        .group_by(PasswordAnalysis.hybrid_decision)
+        .all()
+    )
+
+    conf_map: dict[str, float] = {}
+    for cat, avg_conf in rows:
+        if cat and avg_conf is not None:
+            conf_map[cat] = round(float(avg_conf), 3)
+
+    return {
+        "labels": _HYBRID_DECISION_ORDER,
+        "data":   [conf_map.get(c, 0.0) for c in _HYBRID_DECISION_ORDER],
+    }
+
+
+def get_decision_source_distribution(user_id: int) -> dict[str, Any]:
+    """
+    Count analyses grouped by the Hybrid AI decision_source value.
+
+    Returns Chart.js-ready labels + data.
+    """
+    rows = (
+        db.session.query(
+            PasswordAnalysis.decision_source,
+            func.count(PasswordAnalysis.id).label("cnt"),
+        )
+        .filter(
+            PasswordAnalysis.user_id == user_id,
+            PasswordAnalysis.decision_source.isnot(None),
+        )
+        .group_by(PasswordAnalysis.decision_source)
+        .all()
+    )
+
+    counts: dict[str, int] = {src: 0 for src in _DECISION_SOURCES}
+    for src, cnt in rows:
+        if src in counts:
+            counts[src] = cnt
+
+    # Filter to only sources that actually appear (keeps chart clean)
+    active   = [(s, counts[s]) for s in _DECISION_SOURCES if counts[s] > 0]
+    labels   = [s for s, _ in active]
+    data     = [c for _, c in active]
+
+    # Include "Other" bucket for any unknown sources
+    other = sum(cnt for src, cnt in rows if src not in counts)
+    if other:
+        labels.append("Other")
+        data.append(other)
+
+    return {
+        "labels": labels,
+        "data":   data,
+        "total":  sum(data),
+    }
+
+
+def get_hybrid_analytics_data(user_id: int) -> dict[str, Any]:
+    """
+    Bundle all four Hybrid AI chart datasets in one call.
+
+    Used by the /api/hybrid/analytics endpoint so the frontend
+    makes a single request for the analytics page.
+    """
+    return {
+        "hybrid_decision_dist":  get_hybrid_decision_distribution(user_id),
+        "rule_ml_agreement":     get_rule_ml_agreement_data(user_id),
+        "avg_ml_confidence":     get_avg_ml_confidence(user_id),
+        "decision_source_dist":  get_decision_source_distribution(user_id),
+    }

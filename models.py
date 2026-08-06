@@ -80,6 +80,20 @@ class PasswordAnalysis(db.Model):
     # Optional masked label stored for display (never store plaintext passwords).
     label = db.Column(db.String(120), default="", nullable=False)
 
+    # ── Hybrid AI fields (nullable — old rows have NULL, new rows are populated) ──
+    # ML prediction from the Random Forest model
+    ml_prediction  = db.Column(db.String(20),  default=None, nullable=True)
+    # ML probability for the predicted class (0.0–1.0)
+    ml_confidence  = db.Column(db.Float,        default=None, nullable=True)
+    # Final authoritative strength label from the Hybrid Decision Engine
+    hybrid_decision = db.Column(db.String(20),  default=None, nullable=True)
+    # True when rule engine and ML agreed on the same label
+    hybrid_agreement = db.Column(db.Boolean,    default=None, nullable=True)
+    # Which component drove the final decision
+    decision_source  = db.Column(db.String(40), default=None, nullable=True)
+    # Human-readable reason from the Hybrid Decision Engine
+    hybrid_reason    = db.Column(db.Text,       default=None, nullable=True)
+
     def to_dict(self) -> dict:
         """Return a JSON-serialisable dictionary of this analysis."""
         return {
@@ -97,4 +111,11 @@ class PasswordAnalysis(db.Model):
             "special": self.special,
             "dictionary_word": self.dictionary_word,
             "keyboard_pattern": self.keyboard_pattern,
+            # Hybrid AI fields (None for rows saved before this feature was added)
+            "ml_prediction":    self.ml_prediction,
+            "ml_confidence":    round(self.ml_confidence, 4) if self.ml_confidence is not None else None,
+            "hybrid_decision":  self.hybrid_decision,
+            "hybrid_agreement": self.hybrid_agreement,
+            "decision_source":  self.decision_source,
+            "hybrid_reason":    self.hybrid_reason,
         }

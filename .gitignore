@@ -1,4 +1,29 @@
+# Python
 __pycache__/
-.venv/
 *.pyc
+
+# Virtual Environment
+.venv/
+venv/
+
+# Machine Learning Models
 *.pkl
+
+# Logs
+*.log
+ml/logs/
+
+# Temporary files
+*.tmp
+*.temp
+
+# OS Files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Python cache
+.pytest_cache/

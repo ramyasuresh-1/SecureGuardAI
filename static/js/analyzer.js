@@ -359,7 +359,121 @@ function buildBreachPanel(d) {
   }
 }
 
-// ── Main entry point ──────────────────────────────────────────────────────────
+// ── Hybrid AI Analysis panel ─────────────────────────────────────────────────
+function buildHybridPanel(d) {
+  const grid        = document.getElementById('hybridGrid');
+  const unavailable = document.getElementById('hybridUnavailable');
+  const unavailMsg  = document.getElementById('hybridUnavailableMsg');
+  if (!grid || !unavailable) return;
+
+  // ── Source → badge colour + CSS accent ──────────────────────────────────
+  // Green=Consensus  Blue=Weighted  Orange=RuleEngine  Purple=ML  Red=Breach
+  const SOURCE_STYLE = {
+    'Hybrid Consensus':  { bg: 'bg-success',   col: '#2ecc71' },
+    'Weighted Decision': { bg: 'bg-primary',   col: '#3b82f6' },
+    'Rule Engine':       { bg: 'bg-warning text-dark', col: '#f59e0b' },
+    'Machine Learning':  { bg: 'bg-info text-dark',    col: '#7c3aed' },
+    'Breach Guard':      { bg: 'bg-danger',    col: '#ef4444' },
+  };
+
+  const STRENGTH_COL = {
+    'Very Weak': '#ef4444', 'Weak': '#f59e0b', 'Moderate': '#3b82f6',
+    'Strong': '#8b5cf6',    'Excellent': '#2ecc71',
+  };
+
+  // ── Fallback / ML unavailable ────────────────────────────────────────────
+  if (!d.ml_available) {
+    grid.classList.add('d-none');
+    unavailable.classList.remove('d-none');
+    if (unavailMsg) {
+      unavailMsg.textContent = d.hybrid_reason
+        || 'Machine Learning temporarily unavailable. Rule Engine result used.';
+    }
+    // Still update the source badge with the rule-engine info
+    const srcBadge = document.getElementById('hybridSourceBadge');
+    if (srcBadge) {
+      srcBadge.textContent = 'Rule Engine';
+      srcBadge.className   = 'badge px-3 py-2 bg-warning text-dark';
+    }
+    return;
+  }
+
+  unavailable.classList.add('d-none');
+  grid.classList.remove('d-none');
+
+  // ── Source badge ──────────────────────────────────────────────────────────
+  const srcBadge = document.getElementById('hybridSourceBadge');
+  if (srcBadge) {
+    const style = SOURCE_STYLE[d.decision_source] || { bg: 'bg-secondary', col: '#94a3b8' };
+    srcBadge.textContent = d.decision_source || '—';
+    srcBadge.className   = `badge px-3 py-2 ${style.bg}`;
+  }
+
+  // ── Rule Engine cell ─────────────────────────────────────────────────────
+  const ruleEl = document.getElementById('hybridRuleVal');
+  if (ruleEl) {
+    ruleEl.textContent = d.strength_category || '—';
+    ruleEl.style.color = STRENGTH_COL[d.strength_category] || '#00e5ff';
+  }
+
+  // ── ML Prediction cell ────────────────────────────────────────────────────
+  const mlEl = document.getElementById('hybridMlVal');
+  if (mlEl) {
+    mlEl.textContent = d.ml_prediction || '—';
+    mlEl.style.color = STRENGTH_COL[d.ml_prediction] || '#00e5ff';
+  }
+
+  // ── ML Confidence cell ────────────────────────────────────────────────────
+  const confEl = document.getElementById('hybridConfVal');
+  if (confEl) {
+    const pct = d.ml_confidence != null
+      ? (d.ml_confidence * 100).toFixed(1) + '%'
+      : '—';
+    confEl.textContent = pct;
+    // Colour the confidence: green ≥ 90%, blue ≥ 70%, orange below
+    if (d.ml_confidence >= 0.90)      confEl.style.color = '#2ecc71';
+    else if (d.ml_confidence >= 0.70) confEl.style.color = '#3b82f6';
+    else                               confEl.style.color = '#f59e0b';
+  }
+
+  // ── Agreement cell ────────────────────────────────────────────────────────
+  const agreeEl = document.getElementById('hybridAgreementVal');
+  if (agreeEl) {
+    if (d.hybrid_agreement) {
+      agreeEl.innerHTML = '<i class="fas fa-check-circle me-1"></i>Yes';
+      agreeEl.style.color = '#2ecc71';
+    } else {
+      agreeEl.innerHTML = '<i class="fas fa-times-circle me-1"></i>No';
+      agreeEl.style.color = '#f59e0b';
+    }
+  }
+
+  // ── Decision Source cell ──────────────────────────────────────────────────
+  const srcValEl = document.getElementById('hybridSourceVal');
+  if (srcValEl) {
+    const style = SOURCE_STYLE[d.decision_source] || { col: '#94a3b8' };
+    srcValEl.textContent = d.decision_source || '—';
+    srcValEl.style.color = style.col;
+  }
+
+  // ── Final Decision cell ───────────────────────────────────────────────────
+  const finalEl = document.getElementById('hybridFinalVal');
+  if (finalEl) {
+    finalEl.textContent = d.hybrid_decision || '—';
+    finalEl.style.color = STRENGTH_COL[d.hybrid_decision] || '#00e5ff';
+  }
+
+  // ── Reason banner ─────────────────────────────────────────────────────────
+  const reasonBox  = document.getElementById('hybridReasonBox');
+  const reasonText = document.getElementById('hybridReasonText');
+  if (reasonText) {
+    reasonText.textContent = d.hybrid_reason || '—';
+  }
+  if (reasonBox && d.decision_source) {
+    const style = SOURCE_STYLE[d.decision_source];
+    reasonBox.style.borderLeftColor = style ? style.col : '#00e5ff';
+  }
+}
 document.addEventListener('DOMContentLoaded', () => {
   const metaEl   = document.getElementById('analyzerData');
   if (!metaEl) return;
@@ -397,6 +511,8 @@ document.addEventListener('DOMContentLoaded', () => {
       document.getElementById('kpiPlaceholder')?.classList.remove('d-none');
       document.getElementById('breachAlert')?.classList.add('d-none');
       document.getElementById('breachSafe')?.classList.add('d-none');
+      document.getElementById('hybridGrid')?.classList.add('d-none');
+      document.getElementById('hybridUnavailable')?.classList.add('d-none');
       errorBanner?.classList.add('d-none');
     });
   }
@@ -477,6 +593,7 @@ document.addEventListener('DOMContentLoaded', () => {
         buildFindings(d.findings);
         updateCrackPanel(d);
         buildBreachPanel(d);
+        buildHybridPanel(d);
 
         // ── Radar chart ──────────────────────────────────────────────────
         buildRadarChart(d);
